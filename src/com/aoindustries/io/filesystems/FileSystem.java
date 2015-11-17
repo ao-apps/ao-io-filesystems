@@ -24,6 +24,7 @@ package com.aoindustries.io.filesystems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * The most basic layer of what all file systems have in common.
@@ -54,26 +55,13 @@ public interface FileSystem {
 	/**
 	 * Lists the children of the given path in no specific order.
 	 *
-	 * @return <code>null</code> if the path is not a directory, or a String[] of children.
+	 * @return <code>null</code> if the path is not a directory, or an iterator of children.
+	 *                           The iterator remove() method may be called to delete the current child.
 	 *
 	 * @throws InvalidPathException If the path is not acceptable
 	 * 
 	 * @throws FileNotFoundException if the path does not exist
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	String[] list(Path path) throws InvalidPathException, FileNotFoundException, IOException;
-
-	/**
-	 * @see  #list(com.aoindustries.io.filesystems.Path) for a bit leaner version
-	 */
-	default Path[] listPaths(Path path) throws InvalidPathException, FileNotFoundException, IOException {
-		String[] names = list(path);
-		if(names == null) return null;
-		int len = names.length;
-		Path[] paths = new Path[len];
-		for(int i = 0; i < len; i++) {
-			paths[i] = new Path(path, names[i]);
-		}
-		return paths;
-	}
+	Iterator<Path> list(Path path) throws InvalidPathException, FileNotFoundException, IOException;
 }
