@@ -54,9 +54,9 @@ public interface FileSystem {
 
 	/**
 	 * Lists the children of the given path in no specific order.
+	 * It is possible that paths may be returned that no longer exist.
 	 *
-	 * @return <code>null</code> if the path is not a directory, or an iterator of children.
-	 *                           The iterator remove() method may be called to delete the current child.
+	 * @return a read-only iterator of children or <code>null</code> if the path is not a directory.
 	 *
 	 * @throws InvalidPathException If the path is not acceptable
 	 * 
