@@ -66,10 +66,6 @@ public class ReadOnlyFileSystem implements FileSystem {
 				return iter.next();
 			}
 
-			/**
-			 * The iterators are already supposed to be read-only, but this is here
-			 * for added assurance.
-			 */
 			@Override
 			public void remove() throws ReadOnlyFileSystemException {
 				throw new ReadOnlyFileSystemException();

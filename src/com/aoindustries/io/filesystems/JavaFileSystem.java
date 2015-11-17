@@ -108,10 +108,8 @@ public class JavaFileSystem implements FileSystem {
 	 * 
 	 * @throws FileNotFoundException if the path does not exist
 	 */
-	protected File getFile(Path path) throws InvalidPathException, FileNotFoundException {
+	private File getFile(Path path) throws InvalidPathException, FileNotFoundException {
 		checkPath(path);
-		File[] roots = File.listRoots();
-		if(roots == null) throw new FileNotFoundException("Unable to list roots");
 		throw new NotImplementedException("TODO");
 	}
 
