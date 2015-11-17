@@ -22,6 +22,9 @@
  */
 package com.aoindustries.io.filesystems;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  * Wraps a file system to make it read-only.
  *
@@ -36,10 +39,18 @@ public class ReadOnlyFileSystem implements FileSystem {
 	}
 
 	/**
-	 * Defers path checking to the wrapped file system.
+	 * Defers to the wrapped file system.
 	 */
 	@Override
 	public Path checkPath(Path path) throws InvalidPathException {
 		return wrapped.checkPath(path);
+	}
+
+	/**
+	 * Defers to the wrapped file system.
+	 */
+	@Override
+	public String[] list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
+		return wrapped.list(path);
 	}
 }

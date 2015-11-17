@@ -22,8 +22,11 @@
  */
 package com.aoindustries.io.filesystems;
 
+import com.aoindustries.lang.NotImplementedException;
 import com.aoindustries.lang.NullArgumentException;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * The file system implement by the Java runtime.
@@ -92,5 +95,27 @@ public class JavaFileSystem implements FileSystem {
 			checking = checking.getParent();
 		} while(checking != null);
 		return path;
+	}
+
+	/**
+	 * Gets a Java File for the given path.
+	 *
+	 * @throws InvalidPathException If the path is not acceptable
+	 * 
+	 * @throws FileNotFoundException if the path does not exist
+	 */
+	private File getFile(Path path) throws InvalidPathException, FileNotFoundException {
+		checkPath(path);
+		throw new NotImplementedException("TODO");
+	}
+
+	@Override
+	public String[] list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
+		// TODO: Iterator-based approach based on DirectoryStream
+		File file = getFile(path);
+		if(!file.isDirectory()) return null;
+		String[] list = file.list();
+		if(list == null) throw new IOException("Unable to list directory: " + path);
+		return list;
 	}
 }
