@@ -63,5 +63,5 @@ public interface FileSystem {
 	 * @throws FileNotFoundException if the path does not exist
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	Iterator<Path> list(Path path) throws InvalidPathException, FileNotFoundException, IOException;
+	PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException;
 }

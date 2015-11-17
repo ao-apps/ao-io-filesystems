@@ -24,6 +24,7 @@ package com.aoindustries.io.filesystems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -50,20 +51,28 @@ public class RandomFailFileSystem implements FileSystem {
 	 * Default probabilities
 	 */
 	public static final float
-		DEFAULT_LIST_FAILURE_PROBABILITY = 0.001f
+		DEFAULT_LIST_FAILURE_PROBABILITY = 0.001f,
+		DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY = 0.0001f,
+		DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY = 0.001f
 	;
 
 	private final FileSystem wrapped;
 	private final float listFailureProbability;
+	private final float listIterateFailureProbability;
+	private final float listIterateCloseFailureProbability;
 	private final Random random;
 
 	public RandomFailFileSystem(
 		FileSystem wrapped,
 		float listFailureProbability,
+		float listIterateFailureProbability,
+		float listIterateCloseFailureProbability,
 		Random random
 	) {
 		this.wrapped = wrapped;
 		this.listFailureProbability = listFailureProbability;
+		this.listIterateFailureProbability = listIterateFailureProbability;
+		this.listIterateCloseFailureProbability = listIterateCloseFailureProbability;
 		this.random = random;
 	}
 
@@ -76,6 +85,8 @@ public class RandomFailFileSystem implements FileSystem {
 		this(
 			wrapped,
 			DEFAULT_LIST_FAILURE_PROBABILITY,
+			DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY,
+			DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY,
 			new SecureRandom()
 		);
 	}
@@ -104,9 +115,29 @@ public class RandomFailFileSystem implements FileSystem {
 	 * Defers to the wrapped file system.
 	 */
 	@Override
-	public String[] list(Path path) throws InvalidPathException, RandomFailIOException, FileNotFoundException, IOException {
+	public PathIterator list(Path path) throws InvalidPathException, RandomFailIOException, FileNotFoundException, IOException {
 		checkPath(path);
 		randomFail(listFailureProbability);
-		return wrapped.list(path);
+		PathIterator iter = wrapped.list(path);
+		return new PathIterator() {
+			@Override
+			public boolean hasNext() throws DirectoryIteratorException {
+				try {
+					randomFail(listIterateFailureProbability);
+				} catch(RandomFailIOException e) {
+					throw new DirectoryIteratorException(e);
+				}
+				return iter.hasNext();
+			}
+			@Override
+			public Path next() {
+				return iter.next();
+			}
+			@Override
+			public void close() throws RandomFailIOException, IOException {
+				randomFail(listIterateCloseFailureProbability);
+				iter.close();
+			}
+		};
 	}
 }

@@ -23,13 +23,25 @@
 package com.aoindustries.io.filesystems;
 
 import java.io.Closeable;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
 import java.util.Iterator;
 
 /**
  * Iterates over paths, must be closed when done.
  *
+ * @see DirectoryStream for iteration details
+ *
  * @author  AO Industries, Inc.
  */
 public interface PathIterator extends Iterator<Path>, Closeable {
 
+	/**
+	 * @throws DirectoryIteratorException when an underlying IOException has occurred.
+	 */
+	@Override
+	public boolean hasNext() throws DirectoryIteratorException;
+
+	@Override
+	public Path next();
 }

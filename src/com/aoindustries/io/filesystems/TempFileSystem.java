@@ -23,9 +23,12 @@
 package com.aoindustries.io.filesystems;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * A temporary file system stored in the Java heap.
@@ -64,14 +67,30 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
-	public String[] list(Path path) throws FileNotFoundException {
+	public PathIterator list(Path path) throws FileNotFoundException {
 		// All paths supported: checkPath(path);
-		FileSystemObject file;
+		String[] list;
 		synchronized(files) {
-			file = files.get(path);
+			FileSystemObject file = files.get(path);
 			if(file == null) throw new FileNotFoundException(path.toString());
 			if(!(file instanceof Directory)) return null;
-			return ((Directory)file).list();
+			list = ((Directory)file).list();
 		}
+		return new PathIterator() {
+			private int next = 0;
+			@Override
+			public boolean hasNext() {
+				return next < list.length;
+			}
+			@Override
+			public Path next() {
+				if(next >= list.length) throw new NoSuchElementException();
+				return new Path(path, list[next++]);
+			}
+			@Override
+			public void close() {
+				// Nothing to do
+			}
+		};
 	}
 }

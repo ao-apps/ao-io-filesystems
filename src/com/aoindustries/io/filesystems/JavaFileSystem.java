@@ -105,17 +105,18 @@ public class JavaFileSystem implements FileSystem {
 	 * Gets a Java File for the given path.
 	 *
 	 * @throws InvalidPathException If the path is not acceptable
-	 * 
-	 * @throws FileNotFoundException if the path does not exist
 	 */
-	private File getFile(Path path) throws InvalidPathException, FileNotFoundException {
+	protected File getFile(Path path) throws InvalidPathException, IOException {
 		checkPath(path);
+		File[] roots = File.listRoots();
+		if(roots == null) throw new IOException("Unable to list roots");
 		throw new NotImplementedException("TODO");
 	}
 
 	@Override
 	public PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
 		File file = getFile(path);
+		if(!file.exists()) throw new FileNotFoundException(path.toString());
 		DirectoryStream<java.nio.file.Path> stream;
 		try {
 			stream = Files.newDirectoryStream(file.toPath());
