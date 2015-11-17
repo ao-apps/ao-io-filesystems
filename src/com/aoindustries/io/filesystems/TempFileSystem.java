@@ -22,6 +22,11 @@
  */
 package com.aoindustries.io.filesystems;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 /**
  * A temporary file system stored in the Java heap.
  *
@@ -29,11 +34,44 @@ package com.aoindustries.io.filesystems;
  */
 public class TempFileSystem implements FileSystem {
 
+	private abstract static class FileSystemObject {
+	}
+
+	private static class Directory extends FileSystemObject {
+		private final LinkedList<String> files = new LinkedList<>();
+		private String[] list() {
+			return files.toArray(new String[files.size()]);
+		}
+	}
+
+	private static class RegularFile extends FileSystemObject {
+	}
+
+	private final Map<Path,FileSystemObject> files = new HashMap<>();
+
+	public TempFileSystem() {
+		synchronized(files) {
+			files.put(Path.ROOT, new Directory());
+		}
+	}
+
 	/**
 	 * Temporary file systems support all possible paths.
 	 */
 	@Override
 	public Path checkPath(Path path) {
 		return path;
+	}
+
+	@Override
+	public String[] list(Path path) throws FileNotFoundException {
+		// All paths supported: checkPath(path);
+		FileSystemObject file;
+		synchronized(files) {
+			file = files.get(path);
+			if(file == null) throw new FileNotFoundException(path.toString());
+			if(!(file instanceof Directory)) return null;
+			return ((Directory)file).list();
+		}
 	}
 }

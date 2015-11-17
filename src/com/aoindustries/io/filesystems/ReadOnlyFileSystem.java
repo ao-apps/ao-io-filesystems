@@ -22,8 +22,11 @@
  */
 package com.aoindustries.io.filesystems;
 
+import com.aoindustries.util.AoCollections;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.ReadOnlyFileSystemException;
+import java.util.Iterator;
 
 /**
  * Wraps a file system to make it read-only.
@@ -50,7 +53,32 @@ public class ReadOnlyFileSystem implements FileSystem {
 	 * Defers to the wrapped file system.
 	 */
 	@Override
-	public String[] list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
-		return wrapped.list(path);
+	public PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
+		PathIterator iter = wrapped.list(path);
+		return new PathIterator() {
+			@Override
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+
+			@Override
+			public Path next() {
+				return iter.next();
+			}
+
+			/**
+			 * The iterators are already supposed to be read-only, but this is here
+			 * for added assurance.
+			 */
+			@Override
+			public void remove() throws ReadOnlyFileSystemException {
+				throw new ReadOnlyFileSystemException();
+			}
+
+			@Override
+			public void close() throws IOException {
+				iter.close();
+			}
+		};
 	}
 }

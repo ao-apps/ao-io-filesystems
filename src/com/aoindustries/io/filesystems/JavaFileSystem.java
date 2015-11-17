@@ -27,6 +27,10 @@ import com.aoindustries.lang.NullArgumentException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
+import java.util.Iterator;
 
 /**
  * The file system implement by the Java runtime.
@@ -106,16 +110,34 @@ public class JavaFileSystem implements FileSystem {
 	 */
 	private File getFile(Path path) throws InvalidPathException, FileNotFoundException {
 		checkPath(path);
+		File[] roots = File.listRoots();
+		if(roots == null) throw new FileNotFoundException("Unable to list roots");
 		throw new NotImplementedException("TODO");
 	}
 
 	@Override
-	public String[] list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
-		// TODO: Iterator-based approach based on DirectoryStream
+	public PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
 		File file = getFile(path);
-		if(!file.isDirectory()) return null;
-		String[] list = file.list();
-		if(list == null) throw new IOException("Unable to list directory: " + path);
-		return list;
+		DirectoryStream<java.nio.file.Path> stream;
+		try {
+			stream = Files.newDirectoryStream(file.toPath());
+		} catch(NotDirectoryException e) {
+			return null;
+		}
+		Iterator<java.nio.file.Path> iter = stream.iterator();
+		return new PathIterator() {
+			@Override
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+			@Override
+			public Path next() {
+				return new Path(path, iter.next().getFileName().toString());
+			}
+			@Override
+			public void close() throws IOException {
+				stream.close();
+			}
+		};
 	}
 }
