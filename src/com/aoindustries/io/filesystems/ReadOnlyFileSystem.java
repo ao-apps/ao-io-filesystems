@@ -23,28 +23,23 @@
 package com.aoindustries.io.filesystems;
 
 /**
- * The most basic layer of what all file systems have in common.
- * <p>
- * Every file system is forced to be case-sensitive, even if there is great
- * overhead in doing so.
- * </p>
- * <p>
- * We know this is in some ways redundant with the <code>java.nio.file</code>
- * package released in Java 1.7.  We are looking for something with a much
- * different focus, such as hiding differences between platforms and trying
- * to hide security gotchas.
- * </p>
+ * Wraps a file system to make it read-only.
  *
  * @author  AO Industries, Inc.
  */
-public interface FileSystem {
+public class ReadOnlyFileSystem implements FileSystem {
+
+	private final FileSystem wrapped;
+
+	public ReadOnlyFileSystem(FileSystem wrapped) {
+		this.wrapped = wrapped;
+	}
 
 	/**
-	 * Checks that a path is acceptable to this file system.
-	 *
-	 * @param path The path to check
-	 * @return     The path, if it is acceptable
-	 * @throws InvalidPathException If the path is not acceptable
+	 * Defers path checking to the wrapped file system.
 	 */
-	Path checkPath(Path path) throws InvalidPathException;
+	@Override
+	public Path checkPath(Path path) throws InvalidPathException {
+		return wrapped.checkPath(path);
+	}
 }

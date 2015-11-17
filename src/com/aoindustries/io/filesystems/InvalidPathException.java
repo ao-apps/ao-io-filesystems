@@ -23,28 +23,16 @@
 package com.aoindustries.io.filesystems;
 
 /**
- * The most basic layer of what all file systems have in common.
- * <p>
- * Every file system is forced to be case-sensitive, even if there is great
- * overhead in doing so.
- * </p>
- * <p>
- * We know this is in some ways redundant with the <code>java.nio.file</code>
- * package released in Java 1.7.  We are looking for something with a much
- * different focus, such as hiding differences between platforms and trying
- * to hide security gotchas.
- * </p>
+ * Thrown when an invalid path is created, or when a path is invalid for
+ * a given file system.
  *
  * @author  AO Industries, Inc.
  */
-public interface FileSystem {
+public class InvalidPathException extends IllegalArgumentException {
 
-	/**
-	 * Checks that a path is acceptable to this file system.
-	 *
-	 * @param path The path to check
-	 * @return     The path, if it is acceptable
-	 * @throws InvalidPathException If the path is not acceptable
-	 */
-	Path checkPath(Path path) throws InvalidPathException;
+	private static final long serialVersionUID = 1L;
+
+	public InvalidPathException(String message) {
+		super(message);
+	}
 }

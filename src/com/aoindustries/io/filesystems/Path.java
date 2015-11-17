@@ -58,6 +58,42 @@ public class Path implements Comparable<Path> {
 	 */
 	public static final Path ROOT = new Path(null, "");
 
+	/**
+	 * Joins the array of names to a path object.
+	 * Stops at the end of the array or the first <code>null</code> element.
+	 * 
+	 * @see #explode() for the inverse operation
+	 * @see #explode(java.lang.String[]) for the inverse operation
+	 */
+	public static Path join(String[] names) {
+		Path p = ROOT;
+		for(String name : names) {
+			if(name == null) break;
+			p = new Path(p, name);
+		}
+		return p;
+	}
+
+	/**
+	 * Parses a string representation of a path.
+	 *
+	 * @see #toString() for the inverse operation
+	 * @see #toString(java.lang.Appendable) for the inverse operation
+	 */
+	public static Path valueOf(String value) {
+		Path p = null;
+		int lastSepPos = -1;
+		int len = value.length();
+		do {
+			int sepPos = value.indexOf(SEPARATOR, lastSepPos + 1);
+			if(sepPos == -1) sepPos = len;
+			String name = value.substring(lastSepPos + 1, sepPos);
+			p = (p==null && name.isEmpty()) ? ROOT : new Path(p, name);
+			lastSepPos = sepPos;
+		} while(lastSepPos < len);
+		return p;
+	}
+
 	private final Path parent;
 	private final String name;
 	private final int depth;
@@ -181,8 +217,10 @@ public class Path implements Comparable<Path> {
 
 	/**
 	 * Gets a string representation of the path.
+	 * The root is the empty string.
 	 * 
 	 * @see #toString(java.lang.Appendable) for a possibly faster implementation
+	 * @see #valueOf(java.lang.String) for the inverse operation
 	 */
 	@Override
 	public String toString() {
@@ -206,6 +244,12 @@ public class Path implements Comparable<Path> {
 		return buff.toString();
 	}
 
+	/**
+	 * Gets a string representation of the path.
+	 * The root is the empty string.
+	 *
+	 * @see #valueOf(java.lang.String) for the inverse operation
+	 */
 	public void toString(Appendable out) throws IOException {
 		if(parent != null) {
 			parent.toString(out);
@@ -242,6 +286,8 @@ public class Path implements Comparable<Path> {
 	/**
 	 * Explodes this path into a set of names.  The root path is represented
 	 * by an empty array.
+	 *
+	 * @see #join(java.lang.String[]) for the inverse operation
 	 */
 	public String[] explode() {
 		String[] names = new String[depth];
@@ -254,6 +300,8 @@ public class Path implements Comparable<Path> {
 	 * the element one past the last name will be set to null.
 	 * 
 	 * @throws ArrayIndexOutOfBoundsException if the provided array is of insufficient length
+	 *
+	 * @see #join(java.lang.String[]) for the inverse operation
 	 */
 	public void explode(String[] names) {
 		if(names.length > this.depth) names[this.depth] = null;

@@ -23,9 +23,19 @@
 package com.aoindustries.io.filesystems;
 
 import com.aoindustries.lang.NullArgumentException;
+import java.io.File;
 
 /**
  * The file system implement by the Java runtime.
+ * <p>
+ * The system is treated as a single-root file system.  For Windows, this means
+ * that <code>C:\</code> will become <code>/C:/</code>.
+ * </p>
+ * <p>
+ * Note: To work with any possible filename correctly in Linux, one must use a
+ * single-byte locale, such as "C", "POSIX", or "en_US".  Java has issues when
+ * using UTF-8 encoding and filenames do not contain valid UTF-8.
+ * </p>
  *
  * @author  AO Industries, Inc.
  */
@@ -42,6 +52,7 @@ public class JavaFileSystem implements FileSystem {
 	 * <ol>
 	 * <li>Must not be longer than <code>MAX_PATH_NAME_LENGTH</code> characters</li>
 	 * <li>Must not contain the NULL character</li>
+	 * <li>Must not contain the current platform separator character</li>
 	 * <li>Must not be any length sequence of only "." characters (this protects Windows multi-dot, too)</li>
 	 * </ol>
 	 */
@@ -59,6 +70,13 @@ public class JavaFileSystem implements FileSystem {
 			// Must not contain the NULL character
 			if(name.indexOf(0) != -1) {
 				throw new InvalidPathException("Path name must not contain the NULL character: " + name);
+			}
+			// Path.SEPARATOR already checked in the Path constructor
+			if(File.separatorChar != Path.SEPARATOR) {
+				// Must not contain the current platform separator character
+				if(name.indexOf(File.separatorChar) != -1) {
+					throw new InvalidPathException("Path name must not contain the '" + File.separatorChar + "' character: " + name);
+				}
 			}
 			// Must not be any length sequence of only "." characters
 			boolean hasNonDot = false;
