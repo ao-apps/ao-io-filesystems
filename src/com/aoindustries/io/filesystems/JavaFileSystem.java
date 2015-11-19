@@ -23,7 +23,6 @@
 package com.aoindustries.io.filesystems;
 
 import com.aoindustries.lang.NotImplementedException;
-import com.aoindustries.lang.NullArgumentException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,6 +53,25 @@ public class JavaFileSystem implements FileSystem {
 	 */
 	public static final int MAX_PATH_NAME_LENGTH = 255;
 
+	private static final JavaFileSystem instance = new JavaFileSystem();
+
+	/**
+	 * Only one instance is created.
+	 */
+	public static JavaFileSystem getInstance() {
+		return instance;
+	}
+
+	protected final Path ROOT = new Path(this);
+
+	protected JavaFileSystem() {
+	}
+
+	@Override
+	public Path getRootPath() {
+		return ROOT;
+	}
+
 	/**
 	 * General filename restrictions are:
 	 * <ol>
@@ -64,41 +82,35 @@ public class JavaFileSystem implements FileSystem {
 	 * </ol>
 	 */
 	@Override
-	public Path checkPath(Path path) throws InvalidPathException {
-		NullArgumentException.checkNotNull(path, "path");
-		Path checking = path;
-		do {
-			String name = checking.getName();
-			int nameLen = name.length();
-			// Must not be longer than <code>MAX_PATH_NAME_LENGTH</code> characters
-			if(nameLen > MAX_PATH_NAME_LENGTH) {
-				throw new InvalidPathException("Path name must not be longer than " + MAX_PATH_NAME_LENGTH + " characters: " + name);
+	public void checkSubPath(Path parent, String name) throws InvalidPathException {
+		if(parent.getFileSystem() != this) throw new IllegalArgumentException();
+		int nameLen = name.length();
+		// Must not be longer than <code>MAX_PATH_NAME_LENGTH</code> characters
+		if(nameLen > MAX_PATH_NAME_LENGTH) {
+			throw new InvalidPathException("Path name must not be longer than " + MAX_PATH_NAME_LENGTH + " characters: " + name);
+		}
+		// Must not contain the NULL character
+		if(name.indexOf(0) != -1) {
+			throw new InvalidPathException("Path name must not contain the NULL character: " + name);
+		}
+		// Path.SEPARATOR already checked in the Path constructor
+		if(File.separatorChar != Path.SEPARATOR) {
+			// Must not contain the current platform separator character
+			if(name.indexOf(File.separatorChar) != -1) {
+				throw new InvalidPathException("Path name must not contain the '" + File.separatorChar + "' character: " + name);
 			}
-			// Must not contain the NULL character
-			if(name.indexOf(0) != -1) {
-				throw new InvalidPathException("Path name must not contain the NULL character: " + name);
+		}
+		// Must not be any length sequence of only "." characters
+		boolean hasNonDot = false;
+		for(int i = 0; i < nameLen; i++) {
+			if(name.charAt(i) != '.') {
+				hasNonDot = true;
+				break;
 			}
-			// Path.SEPARATOR already checked in the Path constructor
-			if(File.separatorChar != Path.SEPARATOR) {
-				// Must not contain the current platform separator character
-				if(name.indexOf(File.separatorChar) != -1) {
-					throw new InvalidPathException("Path name must not contain the '" + File.separatorChar + "' character: " + name);
-				}
-			}
-			// Must not be any length sequence of only "." characters
-			boolean hasNonDot = false;
-			for(int i = 0; i < nameLen; i++) {
-				if(name.charAt(i) != '.') {
-					hasNonDot = true;
-					break;
-				}
-			}
-			if(!hasNonDot) {
-				throw new InvalidPathException("Path name must not be any length sequence of only \".\" characters: " + name);
-			}
-			checking = checking.getParent();
-		} while(checking != null);
-		return path;
+		}
+		if(!hasNonDot) {
+			throw new InvalidPathException("Path name must not be any length sequence of only \".\" characters: " + name);
+		}
 	}
 
 	/**
@@ -106,23 +118,19 @@ public class JavaFileSystem implements FileSystem {
 	 *
 	 * @throws InvalidPathException If the path is not acceptable
 	 */
-	protected File getFile(Path path) throws InvalidPathException, IOException {
-		checkPath(path);
+	protected File getFile(Path path) throws IOException {
+		assert path.getFileSystem() == this;
 		File[] roots = File.listRoots();
 		if(roots == null) throw new IOException("Unable to list roots");
 		throw new NotImplementedException("TODO");
 	}
 
 	@Override
-	public PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException {
+	public PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		File file = getFile(path);
 		if(!file.exists()) throw new FileNotFoundException(path.toString());
-		DirectoryStream<java.nio.file.Path> stream;
-		try {
-			stream = Files.newDirectoryStream(file.toPath());
-		} catch(NotDirectoryException e) {
-			return null;
-		}
+		DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(file.toPath());
 		Iterator<java.nio.file.Path> iter = stream.iterator();
 		return new PathIterator() {
 			@Override
