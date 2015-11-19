@@ -22,9 +22,9 @@
  */
 package com.aoindustries.io.filesystems;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 
 /**
@@ -107,20 +107,20 @@ public interface FileSystem {
 	 *
 	 * @return a read-only iterator of children
 	 * 
-	 * @throws FileNotFoundException if the path does not exist
+	 * @throws NoSuchFileException if the path does not exist
 	 * @throws NotDirectoryException if the path is not a directory
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException;
+	PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException;
 
 	/**
 	 * Deletes the file system object at the given path.
 	 *
 	 * @path  Must be from this file system.
 	 *
-	 * @throws FileNotFoundException if the path does not exist
+	 * @throws NoSuchFileException if the path does not exist
 	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException;
+	void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException;
 }
