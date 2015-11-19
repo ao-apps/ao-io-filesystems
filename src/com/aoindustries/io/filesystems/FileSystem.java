@@ -24,6 +24,7 @@ package com.aoindustries.io.filesystems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.NotDirectoryException;
 
 /**
@@ -111,4 +112,13 @@ public interface FileSystem {
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
 	PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException;
+
+	/**
+	 * Deletes the file system object at the given path.
+	 * 
+	 * @throws FileNotFoundException if the path does not exist
+	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
+	 * @throws IOException if an underlying I/O error occurs.
+	 */
+	void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException;
 }
