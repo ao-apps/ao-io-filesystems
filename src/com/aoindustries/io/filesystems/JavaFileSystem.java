@@ -26,6 +26,7 @@ import com.aoindustries.lang.NotImplementedException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
@@ -139,5 +140,11 @@ public class JavaFileSystem implements FileSystem {
 				stream.close();
 			}
 		};
+	}
+
+	@Override
+	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
 	}
 }

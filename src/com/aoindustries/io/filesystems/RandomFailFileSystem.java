@@ -22,10 +22,10 @@
  */
 package com.aoindustries.io.filesystems;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -113,7 +113,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	 * Random chance of fail on list as well as list iteration.
 	 */
 	@Override
-	public PathIterator list(Path path) throws RandomFailIOException, FileNotFoundException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws RandomFailIOException, NoSuchFileException, NotDirectoryException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		randomFail(listFailureProbability);
 		PathWrapper pathWrapper = (PathWrapper)path;
@@ -136,9 +136,9 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	}
 
 	@Override
-	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		randomFail(unlinkFailureProbability);
-		super.unlink(path);
+		super.delete(path);
 	}
 }

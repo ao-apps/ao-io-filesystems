@@ -60,10 +60,9 @@ public class Path implements Comparable<Path> {
 
 	/**
 	 * Constructs the root path for the given file system.
-	 * 
-	 * @see  FileSystem#getRootPath(), which will usually cache a single object for the root
+	 * This will always be the empty path ("").
 	 */
-	protected Path(FileSystem fileSystem) {
+	public Path(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;
 		this.parent = null;
 		this.name = "";

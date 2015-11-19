@@ -23,9 +23,9 @@
 package com.aoindustries.io.filesystems;
 
 import com.aoindustries.lang.NotImplementedException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -70,12 +70,12 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
-	public PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException {
+	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		String[] list;
 		synchronized(files) {
 			FileSystemObject file = files.get(path);
-			if(file == null) throw new FileNotFoundException(path.toString());
+			if(file == null) throw new NoSuchFileException(path.toString());
 			if(!(file instanceof Directory)) throw new NotDirectoryException(path.toString());
 			list = ((Directory)file).list();
 		}
@@ -98,7 +98,7 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
-	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new NotImplementedException("TODO");
 	}
