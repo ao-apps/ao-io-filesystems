@@ -62,14 +62,7 @@ public class JavaFileSystem implements FileSystem {
 		return instance;
 	}
 
-	protected final Path ROOT = new Path(this);
-
 	protected JavaFileSystem() {
-	}
-
-	@Override
-	public Path getRootPath() {
-		return ROOT;
 	}
 
 	/**

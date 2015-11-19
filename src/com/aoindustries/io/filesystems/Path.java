@@ -60,8 +60,10 @@ public class Path implements Comparable<Path> {
 
 	/**
 	 * Constructs the root path for the given file system.
+	 * 
+	 * @see  FileSystem#getRootPath(), which will usually cache a single object for the root
 	 */
-	Path(FileSystem fileSystem) {
+	protected Path(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;
 		this.parent = null;
 		this.name = "";
@@ -98,6 +100,9 @@ public class Path implements Comparable<Path> {
 		this.depth = parent.depth + 1;
 	}
 
+	/**
+	 * @see #equals(com.aoindustries.io.filesystems.Path)
+	 */
 	@Override
 	public boolean equals(Object o) {
 		return
@@ -106,6 +111,10 @@ public class Path implements Comparable<Path> {
 		;
 	}
 
+	/**
+	 * Two paths are equal if they are of the same depth and have equal names.
+	 * Two paths on different file systems can be equal.
+	 */
 	public boolean equals(Path other) {
 		// Identity shortcut
 		if(this == other) return true;
@@ -229,7 +238,7 @@ public class Path implements Comparable<Path> {
 	}
 
 	/**
-	 * Gets the file system this is part of.
+	 * Gets the file system this path belongs to and is valid for.
 	 */
 	public FileSystem getFileSystem() {
 		return fileSystem;
@@ -251,8 +260,8 @@ public class Path implements Comparable<Path> {
 
 	/**
 	 * Gets the depth of this path.  The root has a zero depth.
-	 * This is also one less than the number of names in this path.
-	 * This is also the number of elements that will be returned from <code>explode()</code>.
+	 * This is also the number of non-root names in this path, such as the
+	 * number of elements that will be returned from <code>explode()</code>.
 	 * 
 	 * @see #explode()
 	 */

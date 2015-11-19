@@ -25,6 +25,8 @@ package com.aoindustries.io.filesystems;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NotDirectoryException;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -34,7 +36,7 @@ import java.util.Random;
  *
  * @author  AO Industries, Inc.
  */
-public class RandomFailFileSystem implements FileSystem {
+public class RandomFailFileSystem extends FileSystemWrapper {
 
 	/**
 	 * Thrown when a failure occurs randomly.
@@ -53,26 +55,29 @@ public class RandomFailFileSystem implements FileSystem {
 	public static final float
 		DEFAULT_LIST_FAILURE_PROBABILITY = 0.001f,
 		DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY = 0.0001f,
-		DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY = 0.001f
+		DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY = 0.001f,
+		DEFAULT_UNLINK_FAILURE_PROBABILITY = 0.001f
 	;
 
-	private final FileSystem wrapped;
 	private final float listFailureProbability;
 	private final float listIterateFailureProbability;
 	private final float listIterateCloseFailureProbability;
+	private final float unlinkFailureProbability;
 	private final Random random;
 
 	public RandomFailFileSystem(
-		FileSystem wrapped,
+		FileSystem wrappedFileSystem,
 		float listFailureProbability,
 		float listIterateFailureProbability,
 		float listIterateCloseFailureProbability,
+		float unlinkFailureProbability,
 		Random random
 	) {
-		this.wrapped = wrapped;
+		super(wrappedFileSystem);
 		this.listFailureProbability = listFailureProbability;
 		this.listIterateFailureProbability = listIterateFailureProbability;
 		this.listIterateCloseFailureProbability = listIterateCloseFailureProbability;
+		this.unlinkFailureProbability = unlinkFailureProbability;
 		this.random = random;
 	}
 
@@ -81,25 +86,18 @@ public class RandomFailFileSystem implements FileSystem {
 	 * 
 	 * @see SecureRandom
 	 */
-	public RandomFailFileSystem(FileSystem wrapped) {
+	public RandomFailFileSystem(FileSystem wrappedFileSystem) {
 		this(
-			wrapped,
+			wrappedFileSystem,
 			DEFAULT_LIST_FAILURE_PROBABILITY,
 			DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY,
 			DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY,
+			DEFAULT_UNLINK_FAILURE_PROBABILITY,
 			new SecureRandom()
 		);
 	}
 
-	/**
-	 * Defers to the wrapped file system.
-	 */
-	@Override
-	public Path checkPath(Path path) throws InvalidPathException {
-		return wrapped.checkPath(path);
-	}
-
-	private void randomFail(float probability) throws RandomFailIOException {
+	protected void randomFail(float probability) throws RandomFailIOException {
 		if(
 			probability > 0
 			&& (
@@ -112,14 +110,14 @@ public class RandomFailFileSystem implements FileSystem {
 	}
 
 	/**
-	 * Defers to the wrapped file system.
+	 * Random chance of fail on list as well as list iteration.
 	 */
 	@Override
-	public PathIterator list(Path path) throws InvalidPathException, RandomFailIOException, FileNotFoundException, IOException {
-		checkPath(path);
+	public PathIterator list(Path path) throws RandomFailIOException, FileNotFoundException, NotDirectoryException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		randomFail(listFailureProbability);
-		PathIterator iter = wrapped.list(path);
-		return new PathIterator() {
+		PathWrapper pathWrapper = (PathWrapper)path;
+		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath)) {
 			@Override
 			public boolean hasNext() throws DirectoryIteratorException {
 				try {
@@ -127,17 +125,20 @@ public class RandomFailFileSystem implements FileSystem {
 				} catch(RandomFailIOException e) {
 					throw new DirectoryIteratorException(e);
 				}
-				return iter.hasNext();
-			}
-			@Override
-			public Path next() {
-				return iter.next();
+				return super.hasNext();
 			}
 			@Override
 			public void close() throws RandomFailIOException, IOException {
 				randomFail(listIterateCloseFailureProbability);
-				iter.close();
+				super.close();
 			}
 		};
+	}
+
+	@Override
+	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		randomFail(unlinkFailureProbability);
+		super.unlink(path);
 	}
 }

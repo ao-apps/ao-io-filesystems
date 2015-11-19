@@ -22,10 +22,12 @@
  */
 package com.aoindustries.io.filesystems;
 
+import com.aoindustries.lang.NotImplementedException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -37,7 +39,7 @@ import java.util.NoSuchElementException;
  */
 public class TempFileSystem implements FileSystem {
 
-	private abstract static class FileSystemObject {
+	protected abstract static class FileSystemObject {
 	}
 
 	private static class Directory extends FileSystemObject {
@@ -50,11 +52,11 @@ public class TempFileSystem implements FileSystem {
 	private static class RegularFile extends FileSystemObject {
 	}
 
-	private final Map<Path,FileSystemObject> files = new HashMap<>();
+	protected final Map<Path,FileSystemObject> files = new HashMap<>();
 
 	public TempFileSystem() {
 		synchronized(files) {
-			files.put(Path.ROOT, new Directory());
+			files.put(new Path(this), new Directory());
 		}
 	}
 
@@ -62,18 +64,19 @@ public class TempFileSystem implements FileSystem {
 	 * Temporary file systems support all possible paths.
 	 */
 	@Override
-	public Path checkPath(Path path) {
-		return path;
+	public void checkSubPath(Path parent, String name) {
+		if(parent.getFileSystem() != this) throw new IllegalArgumentException();
+		// All allowed
 	}
 
 	@Override
-	public PathIterator list(Path path) throws FileNotFoundException {
-		// All paths supported: checkPath(path);
+	public PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		String[] list;
 		synchronized(files) {
 			FileSystemObject file = files.get(path);
 			if(file == null) throw new FileNotFoundException(path.toString());
-			if(!(file instanceof Directory)) return null;
+			if(!(file instanceof Directory)) throw new NotDirectoryException(path.toString());
 			list = ((Directory)file).list();
 		}
 		return new PathIterator() {
@@ -92,5 +95,11 @@ public class TempFileSystem implements FileSystem {
 				// Nothing to do
 			}
 		};
+	}
+
+	@Override
+	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
 	}
 }
