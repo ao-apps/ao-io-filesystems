@@ -53,79 +53,49 @@ public class Path implements Comparable<Path> {
 
 	public static final char SEPARATOR = '/';
 
-	/**
-	 * The root path.
-	 */
-	public static final Path ROOT = new Path(null, "");
-
-	/**
-	 * Joins the array of names to a path object.
-	 * Stops at the end of the array or the first <code>null</code> element.
-	 * 
-	 * @see #explode() for the inverse operation
-	 * @see #explode(java.lang.String[]) for the inverse operation
-	 */
-	public static Path join(String[] names) {
-		Path p = ROOT;
-		for(String name : names) {
-			if(name == null) break;
-			p = new Path(p, name);
-		}
-		return p;
-	}
-
-	/**
-	 * Parses a string representation of a path.
-	 *
-	 * @see #toString() for the inverse operation
-	 * @see #toString(java.lang.Appendable) for the inverse operation
-	 */
-	public static Path valueOf(String value) {
-		Path p = null;
-		int lastSepPos = -1;
-		int len = value.length();
-		do {
-			int sepPos = value.indexOf(SEPARATOR, lastSepPos + 1);
-			if(sepPos == -1) sepPos = len;
-			String name = value.substring(lastSepPos + 1, sepPos);
-			p = (p==null && name.isEmpty()) ? ROOT : new Path(p, name);
-			lastSepPos = sepPos;
-		} while(lastSepPos < len);
-		return p;
-	}
-
+	private final FileSystem fileSystem;
 	private final Path parent;
 	private final String name;
 	private final int depth;
 
 	/**
-	 * @param  parent  must be <code>null</code> for the root, or non-null for
-	 *                 all non-root.
-	 * @param  name    must be <code>""</code> for the root, non-empty for all non-root.
-	 *                 Must not contain the <code>SEPARATOR</code> character
+	 * Constructs the root path for the given file system.
+	 */
+	Path(FileSystem fileSystem) {
+		this.fileSystem = fileSystem;
+		this.parent = null;
+		this.name = "";
+		this.depth = 0;
+	}
+
+	/**
+	 * Constructs a child path of the given parent.
+	 *
+	 * @param  parent      Must not be <code>null</code>.
+	 * @param  name        Must not be <code>""</code>.
+	 *                     Must not contain the <code>SEPARATOR</code> character.
 	 * 
-	 * @see FileSystem#checkPath(com.aoindustries.io.filesystems.Path)
-	 *                 Each file system may impose additional path restrictions.
+	 * @see FileSystem#checkSubPath(com.aoindustries.io.filesystems.Path, java.lang.String)
+	 *                     Each file system may impose additional path restrictions.
 	 */
 	public Path(Path parent, String name) throws InvalidPathException {
-		if(name.isEmpty()) {
-			if(parent != null) {
-				throw new InvalidPathException("Only the root may have an empty name");
-			}
-		} else {
-			if(parent == null) {
-				throw new InvalidPathException("Parent required for non-root path");
-			}
-			// Must not be empty
-			assert !name.isEmpty();
-			// Must not contain the SEPARATOR character
-			if(name.indexOf(SEPARATOR) != -1) {
-				throw new InvalidPathException("Path name must not contain the '" + SEPARATOR + "' character: " + name);
-			}
+		// Must not be null
+		if(parent == null) {
+			throw new InvalidPathException("Parent required for non-root path");
 		}
+		// Must not be ""
+		if(name.isEmpty()) {
+			throw new InvalidPathException("Only the root may have an empty name");
+		}
+		// Must not contain the SEPARATOR character
+		if(name.indexOf(SEPARATOR) != -1) {
+			throw new InvalidPathException("Path name must not contain the '" + SEPARATOR + "' character: " + name);
+		}
+		parent.fileSystem.checkSubPath(parent, name);
+		this.fileSystem = parent.fileSystem;
 		this.parent = parent;
 		this.name = name;
-		this.depth = (parent == null) ? 0 : (parent.depth + 1);
+		this.depth = parent.depth + 1;
 	}
 
 	@Override
@@ -220,7 +190,7 @@ public class Path implements Comparable<Path> {
 	 * The root is the empty string.
 	 * 
 	 * @see #toString(java.lang.Appendable) for a possibly faster implementation
-	 * @see #valueOf(java.lang.String) for the inverse operation
+	 * @see FileSystem#parsePath(java.lang.String) for the inverse operation
 	 */
 	@Override
 	public String toString() {
@@ -238,9 +208,9 @@ public class Path implements Comparable<Path> {
 		try {
 			toString(buff);
 		} catch(IOException e) {
-			throw new AssertionError("Should not happen with StringBuilder", e);
+			throw new AssertionError("IOException should not happen with StringBuilder", e);
 		}
-		assert buff.length() == totalLen;
+		assert buff.length() == totalLen : "StringBuffer preallocation inconsistent with resulting String length";
 		return buff.toString();
 	}
 
@@ -248,7 +218,7 @@ public class Path implements Comparable<Path> {
 	 * Gets a string representation of the path.
 	 * The root is the empty string.
 	 *
-	 * @see #valueOf(java.lang.String) for the inverse operation
+	 * @see FileSystem#parsePath(java.lang.String) for the inverse operation
 	 */
 	public void toString(Appendable out) throws IOException {
 		if(parent != null) {
@@ -256,6 +226,13 @@ public class Path implements Comparable<Path> {
 			out.append(SEPARATOR);
 		}
 		out.append(name);
+	}
+
+	/**
+	 * Gets the file system this is part of.
+	 */
+	public FileSystem getFileSystem() {
+		return fileSystem;
 	}
 
 	/**
@@ -284,10 +261,10 @@ public class Path implements Comparable<Path> {
 	}
 
 	/**
-	 * Explodes this path into a set of names.  The root path is represented
-	 * by an empty array.
+	 * Explodes this path into a set of names, not including the empty root name
+	 * itself.  The root path is represented by an empty array.
 	 *
-	 * @see #join(java.lang.String[]) for the inverse operation
+	 * @see FileSystem#join(java.lang.String[]) for the inverse operation
 	 */
 	public String[] explode() {
 		String[] names = new String[depth];
@@ -301,7 +278,7 @@ public class Path implements Comparable<Path> {
 	 * 
 	 * @throws ArrayIndexOutOfBoundsException if the provided array is of insufficient length
 	 *
-	 * @see #join(java.lang.String[]) for the inverse operation
+	 * @see FileSystem#join(java.lang.String[]) for the inverse operation
 	 */
 	public void explode(String[] names) {
 		if(names.length > this.depth) names[this.depth] = null;
