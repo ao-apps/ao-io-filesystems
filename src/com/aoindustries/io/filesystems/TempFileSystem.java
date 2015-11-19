@@ -102,4 +102,10 @@ public class TempFileSystem implements FileSystem {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new NotImplementedException("TODO");
 	}
+
+	@Override
+	public long size(Path path) throws NoSuchFileException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
+	}
 }

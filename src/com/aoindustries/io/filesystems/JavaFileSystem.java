@@ -196,4 +196,10 @@ public class JavaFileSystem implements FileSystem {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		Files.delete(getJavaPath(path));
 	}
+
+	@Override
+	public long size(Path path) throws NoSuchFileException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		return Files.size(getJavaPath(path));
+	}
 }

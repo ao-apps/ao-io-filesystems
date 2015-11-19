@@ -56,13 +56,15 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		DEFAULT_LIST_FAILURE_PROBABILITY = 0.001f,
 		DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY = 0.0001f,
 		DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY = 0.001f,
-		DEFAULT_UNLINK_FAILURE_PROBABILITY = 0.001f
+		DEFAULT_UNLINK_FAILURE_PROBABILITY = 0.001f,
+		DEFAULT_SIZE_FAILURE_PROBABILITY = 0.001f
 	;
 
 	private final float listFailureProbability;
 	private final float listIterateFailureProbability;
 	private final float listIterateCloseFailureProbability;
 	private final float unlinkFailureProbability;
+	private final float sizeFailureProbability;
 	private final Random random;
 
 	public RandomFailFileSystem(
@@ -71,6 +73,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		float listIterateFailureProbability,
 		float listIterateCloseFailureProbability,
 		float unlinkFailureProbability,
+		float sizeFailureProbability,
 		Random random
 	) {
 		super(wrappedFileSystem);
@@ -78,6 +81,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		this.listIterateFailureProbability = listIterateFailureProbability;
 		this.listIterateCloseFailureProbability = listIterateCloseFailureProbability;
 		this.unlinkFailureProbability = unlinkFailureProbability;
+		this.sizeFailureProbability = sizeFailureProbability;
 		this.random = random;
 	}
 
@@ -93,6 +97,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 			DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY,
 			DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY,
 			DEFAULT_UNLINK_FAILURE_PROBABILITY,
+			DEFAULT_SIZE_FAILURE_PROBABILITY,
 			new SecureRandom()
 		);
 	}
@@ -140,5 +145,12 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		randomFail(unlinkFailureProbability);
 		super.delete(path);
+	}
+
+	@Override
+	public long size(Path path) throws NoSuchFileException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		randomFail(sizeFailureProbability);
+		return super.size(path);
 	}
 }

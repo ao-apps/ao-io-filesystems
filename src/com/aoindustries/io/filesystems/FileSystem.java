@@ -115,7 +115,9 @@ public interface FileSystem {
 
 	/**
 	 * Deletes the file system object at the given path.
-	 * 
+	 *
+	 * @path  Must be from this file system.
+	 *
 	 * @throws FileNotFoundException if the path does not exist
 	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
 	 * @throws IOException if an underlying I/O error occurs.

@@ -29,6 +29,7 @@ import java.util.Iterator;
 
 /**
  * Iterates over paths, must be closed when done.
+ * TODO: Support ListIterator when underlying iterator is a list iterator, will require PathListIterator implementation.
  *
  * @see DirectoryStream for iteration details
  *

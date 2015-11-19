@@ -22,9 +22,6 @@
  */
 package com.aoindustries.io.filesystems;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.ReadOnlyFileSystemException;
 
 /**
@@ -39,7 +36,7 @@ public class ReadOnlyFileSystem extends FileSystemWrapper {
 	}
 
 	@Override
-	public void unlink(Path path) throws ReadOnlyFileSystemException {
+	public void delete(Path path) throws ReadOnlyFileSystemException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new ReadOnlyFileSystemException();
 	}

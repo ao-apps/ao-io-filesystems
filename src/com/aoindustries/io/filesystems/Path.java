@@ -84,6 +84,9 @@ public class Path implements Comparable<Path> {
 		if(parent == null) {
 			throw new InvalidPathException("Parent required for non-root path");
 		}
+		if(name == null) {
+			throw new InvalidPathException("Path name may not be null");
+		}
 		// Must not be ""
 		if(name.isEmpty()) {
 			throw new InvalidPathException("Only the root may have an empty name");
@@ -284,16 +287,19 @@ public class Path implements Comparable<Path> {
 	 * Explodes this path to the given array.  If the array is not filled,
 	 * the element one past the last name will be set to null.
 	 * 
+	 * @return  the array parameter
+	 *
 	 * @throws ArrayIndexOutOfBoundsException if the provided array is of insufficient length
 	 *
 	 * @see FileSystem#join(java.lang.String[]) for the inverse operation
 	 */
-	public void explode(String[] names) {
+	public String[] explode(String[] names) {
 		if(names.length > this.depth) names[this.depth] = null;
 		Path me = this;
 		while(me.depth > 0) {
-			names[me.depth - 1] = name;
+			names[me.depth - 1] = me.name;
 			me = me.parent;
 		}
+		return names;
 	}
 }

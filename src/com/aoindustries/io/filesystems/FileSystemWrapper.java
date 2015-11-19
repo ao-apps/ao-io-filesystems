@@ -138,4 +138,10 @@ abstract public class FileSystemWrapper implements FileSystem {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		wrappedFileSystem.delete(unwrapPath(path));
 	}
+
+	@Override
+	public long size(Path path) throws NoSuchFileException, IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		return wrappedFileSystem.size(unwrapPath(path));
+	}
 }
