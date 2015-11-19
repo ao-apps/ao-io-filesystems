@@ -24,7 +24,7 @@ package com.aoindustries.io.filesystems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
+import java.nio.file.NotDirectoryException;
 
 /**
  * The most basic layer of what all file systems have in common.
@@ -35,8 +35,8 @@ import java.util.Iterator;
  * <p>
  * We know this is in some ways redundant with the <code>java.nio.file</code>
  * package released in Java 1.7.  We are looking for something with a much
- * different focus, such as hiding differences between platforms and trying
- * to hide security gotchas.
+ * different (and narrower) focus, such as hiding differences between platforms
+ * and trying to hide security gotchas.
  * </p>
  *
  * @author  AO Industries, Inc.
@@ -44,24 +44,79 @@ import java.util.Iterator;
 public interface FileSystem {
 
 	/**
-	 * Checks that a path is acceptable to this file system.
+	 * Gets the root path for this file system.  This will always be the empty
+	 * path ("").
+	 * 
+	 * @see  Path#Path(com.aoindustries.io.filesystems.FileSystem)
+	 */
+	Path getRootPath();
+
+	/**
+	 * Checks that a given path name is acceptable to this file system.
+	 * Regular path rules are already checked, this is for additional
+	 * file system specific constraints.
+	 * The root path is never passed here.
 	 *
-	 * @param path The path to check
+	 * @param path The path to check, must be from this file system.
 	 * @return     The path, if it is acceptable
 	 * @throws InvalidPathException If the path is not acceptable
 	 */
-	Path checkPath(Path path) throws InvalidPathException;
+	void checkSubPath(Path parent, String name) throws InvalidPathException;
+
+	/**
+	 * Joins the array of names to a path object.
+	 * Stops at the end of the array or the first <code>null</code> element.
+	 *
+	 * @see Path#explode() for the inverse operation
+	 * @see Path#explode(java.lang.String[]) for the inverse operation
+	 */
+	default Path join(String[] names) throws InvalidPathException {
+		Path p = getRootPath();
+		for(String name : names) {
+			if(name == null) break;
+			p = new Path(p, name);
+		}
+		return p;
+	}
+
+	/**
+	 * Parses a string representation of a path.
+	 *
+	 * @see Path#toString() for the inverse operation
+	 * @see Path#toString(java.lang.Appendable) for the inverse operation
+	 */
+	default Path parsePath(String value) throws InvalidPathException {
+		Path p = null;
+		int lastSepPos = -1;
+		int len = value.length();
+		do {
+			int sepPos = value.indexOf(Path.SEPARATOR, lastSepPos + 1);
+			if(sepPos == -1) sepPos = len;
+			String name = value.substring(lastSepPos + 1, sepPos);
+			if(p == null) {
+				// root must have empty name
+				if(!name.isEmpty()) throw new InvalidPathException("Non-empty root name: " + name);
+				p = getRootPath();
+			} else {
+				p = new Path(p, name);
+			}
+			lastSepPos = sepPos;
+		} while(lastSepPos < len);
+		return p;
+	}
 
 	/**
 	 * Lists the children of the given path in no specific order.
 	 * It is possible that paths may be returned that no longer exist.
+	 * It is also possible that new file system objects created after the beginning of iteration are not returned.
 	 *
-	 * @return a read-only iterator of children or <code>null</code> if the path is not a directory.
+	 * @path  Must be from this file system.
 	 *
-	 * @throws InvalidPathException If the path is not acceptable
+	 * @return a read-only iterator of children
 	 * 
 	 * @throws FileNotFoundException if the path does not exist
+	 * @throws NotDirectoryException if the path is not a directory
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	PathIterator list(Path path) throws InvalidPathException, FileNotFoundException, IOException;
+	PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException;
 }
