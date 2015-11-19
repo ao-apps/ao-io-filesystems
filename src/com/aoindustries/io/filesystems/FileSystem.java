@@ -123,4 +123,14 @@ public interface FileSystem {
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
 	void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException;
+
+	/**
+	 * Gets the size of the file system object at the given path.
+	 *
+	 * @path  Must be from this file system.
+	 *
+	 * @throws NoSuchFileException if the path does not exist
+	 * @throws IOException if an underlying I/O error occurs.
+	 */
+	long size(Path path) throws NoSuchFileException, IOException;
 }
