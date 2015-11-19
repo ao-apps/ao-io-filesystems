@@ -22,14 +22,14 @@
  */
 package com.aoindustries.io.filesystems;
 
-import com.aoindustries.lang.NotImplementedException;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -63,7 +63,21 @@ public class JavaFileSystem implements FileSystem {
 		return instance;
 	}
 
+	private static final java.nio.file.FileSystem javaFS = FileSystems.getDefault();
+
+	protected final boolean isSingleRoot;
+
 	protected JavaFileSystem() {
+		Iterator<java.nio.file.Path> roots = javaFS.getRootDirectories().iterator();
+		if(!roots.hasNext()) throw new AssertionError("No root");
+		java.nio.file.Path root = roots.next();
+		if(roots.hasNext()) {
+			// Has more than one root
+			isSingleRoot = false;
+		} else {
+			// Root must simply be the separator (Not something like C:\)
+			isSingleRoot = javaFS.getSeparator().equals(root.toString());
+		}
 	}
 
 	/**
@@ -88,10 +102,11 @@ public class JavaFileSystem implements FileSystem {
 			throw new InvalidPathException("Path name must not contain the NULL character: " + name);
 		}
 		// Path.SEPARATOR already checked in the Path constructor
-		if(File.separatorChar != Path.SEPARATOR) {
+		String javaSep = javaFS.getSeparator();
+		if(javaSep.length() != 1 && javaSep.charAt(0) != Path.SEPARATOR) {
 			// Must not contain the current platform separator character
-			if(name.indexOf(File.separatorChar) != -1) {
-				throw new InvalidPathException("Path name must not contain the '" + File.separatorChar + "' character: " + name);
+			if(name.contains(javaSep)) {
+				throw new InvalidPathException("Path name must not contain the '" + javaSep + "' separator: " + name);
 			}
 		}
 		// Must not be any length sequence of only "." characters
@@ -112,39 +127,73 @@ public class JavaFileSystem implements FileSystem {
 	 *
 	 * @throws InvalidPathException If the path is not acceptable
 	 */
-	protected File getFile(Path path) throws IOException {
+	protected java.nio.file.Path getJavaPath(Path path) throws IOException {
 		assert path.getFileSystem() == this;
-		File[] roots = File.listRoots();
-		if(roots == null) throw new IOException("Unable to list roots");
-		throw new NotImplementedException("TODO");
+		if(isSingleRoot) {
+			return javaFS.getPath(javaFS.getSeparator(), path.explode());
+		} else {
+			String[] exploded = path.explode();
+			if(exploded.length == 0) throw new IOException("Cannot map fake root into non-Unix environment");
+			String expectedRoot = exploded[0] + javaFS.getSeparator();
+			for(java.nio.file.Path root : javaFS.getRootDirectories()) {
+				String rootStr = root.toString();
+				if(rootStr.equals(exploded[0])) {
+					return javaFS.getPath(
+						rootStr,
+						Arrays.copyOfRange(exploded, 1, exploded.length)
+					);
+				}
+			}
+			throw new NoSuchFileException(expectedRoot);
+		}
 	}
 
 	@Override
-	public PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		File file = getFile(path);
-		if(!file.exists()) throw new FileNotFoundException(path.toString());
-		DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(file.toPath());
-		Iterator<java.nio.file.Path> iter = stream.iterator();
-		return new PathIterator() {
-			@Override
-			public boolean hasNext() {
-				return iter.hasNext();
-			}
-			@Override
-			public Path next() {
-				return new Path(path, iter.next().getFileName().toString());
-			}
-			@Override
-			public void close() throws IOException {
-				stream.close();
-			}
-		};
+		if(isSingleRoot || path.getParent() != null) {
+			DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(getJavaPath(path));
+			Iterator<java.nio.file.Path> iter = stream.iterator();
+			return new PathIterator() {
+				@Override
+				public boolean hasNext() {
+					return iter.hasNext();
+				}
+				@Override
+				public Path next() {
+					return new Path(path, iter.next().getFileName().toString());
+				}
+				@Override
+				public void close() throws IOException {
+					stream.close();
+				}
+			};
+		} else {
+			// List roots and strip their trailing separator
+			String javaSeparator = javaFS.getSeparator();
+			Iterator<java.nio.file.Path> rootIter = javaFS.getRootDirectories().iterator();
+			return new PathIterator() {
+				@Override
+				public boolean hasNext() {
+					return rootIter.hasNext();
+				}
+				@Override
+				public Path next() {
+					String rootStr = rootIter.next().toString();
+					if(!rootStr.endsWith(javaSeparator)) throw new AssertionError("Root does not end with separator: " + rootStr);
+					return new Path(path, rootStr.substring(0, rootStr.length() - javaSeparator.length()));
+				}
+				@Override
+				public void close() {
+					// Nothing to do
+				}
+			};
+		}
 	}
 
 	@Override
-	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		Files.delete(getJavaPath(path));
 	}
 }

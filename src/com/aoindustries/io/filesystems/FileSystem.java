@@ -44,14 +44,6 @@ import java.nio.file.NotDirectoryException;
 public interface FileSystem {
 
 	/**
-	 * Gets the root path for this file system.  This will always be the empty
-	 * path ("").
-	 * 
-	 * @see  Path#Path(com.aoindustries.io.filesystems.FileSystem)
-	 */
-	Path getRootPath();
-
-	/**
 	 * Checks that a given path name is acceptable to this file system.
 	 * Regular path rules are already checked, this is for additional
 	 * file system specific constraints.
@@ -71,7 +63,7 @@ public interface FileSystem {
 	 * @see Path#explode(java.lang.String[]) for the inverse operation
 	 */
 	default Path join(String[] names) throws InvalidPathException {
-		Path p = getRootPath();
+		Path p = new Path(this);
 		for(String name : names) {
 			if(name == null) break;
 			p = new Path(p, name);
@@ -96,7 +88,7 @@ public interface FileSystem {
 			if(p == null) {
 				// root must have empty name
 				if(!name.isEmpty()) throw new InvalidPathException("Non-empty root name: " + name);
-				p = getRootPath();
+				p = new Path(this);
 			} else {
 				p = new Path(p, name);
 			}

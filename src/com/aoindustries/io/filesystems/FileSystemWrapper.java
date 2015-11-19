@@ -22,10 +22,10 @@
  */
 package com.aoindustries.io.filesystems;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 
 /**
@@ -90,6 +90,16 @@ abstract public class FileSystemWrapper implements FileSystem {
 		wrappedFileSystem.checkSubPath(unwrapPath(parent), name);
 	}
 
+	@Override
+	public Path join(String[] names) throws InvalidPathException {
+		return wrapPath(wrappedFileSystem.join(names));
+	}
+
+	@Override
+	public Path parsePath(String value) throws InvalidPathException {
+		return wrapPath(wrappedFileSystem.parsePath(value));
+	}
+
 	protected class PathIteratorWrapper extends PathIterator {
 
 		protected final PathWrapper parent;
@@ -117,15 +127,15 @@ abstract public class FileSystemWrapper implements FileSystem {
 	}
 
 	@Override
-	public PathIterator list(Path path) throws FileNotFoundException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		PathWrapper pathWrapper = (PathWrapper)path;
 		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath));
 	}
 
 	@Override
-	public void unlink(Path path) throws FileNotFoundException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		wrappedFileSystem.unlink(unwrapPath(path));
+		wrappedFileSystem.delete(unwrapPath(path));
 	}
 }
