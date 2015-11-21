@@ -143,6 +143,13 @@ abstract public class FileSystemWrapper implements FileSystem {
 	}
 
 	@Override
+	public Path createFile(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		wrappedFileSystem.createFile(unwrapPath(path));
+		return path;
+	}
+
+	@Override
 	public Path createDirectory(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		wrappedFileSystem.createDirectory(unwrapPath(path));

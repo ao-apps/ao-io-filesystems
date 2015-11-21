@@ -135,10 +135,21 @@ public interface FileSystem {
 	long size(Path path) throws IOException;
 
 	/**
-	 * Atomically creates a directory (must not have already existed).
-	 * 
+	 * Atomically creates an empty file (must not have already existed).
+	 *
 	 * @return  returns the path
-	 * 
+	 *
+	 * @throws UnsupportedOperationException if unable to create atomically
+	 * @throws FileAlreadyExistsException if file already exists
+	 * @throws IOException if an underlying I/O error occurs.
+	 */
+	Path createFile(Path path) throws IOException;
+
+	/**
+	 * Atomically creates a directory (must not have already existed).
+	 *
+	 * @return  returns the path
+	 *
 	 * @throws UnsupportedOperationException if unable to create atomically
 	 * @throws FileAlreadyExistsException if file already exists
 	 * @throws IOException if an underlying I/O error occurs.

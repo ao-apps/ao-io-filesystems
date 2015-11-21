@@ -108,6 +108,12 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
+	public Path createFile(Path path) {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
+	}
+
+	@Override
 	public Path createDirectory(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new NotImplementedException("TODO");

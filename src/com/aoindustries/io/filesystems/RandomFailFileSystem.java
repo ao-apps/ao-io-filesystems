@@ -62,6 +62,9 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		default float getSize() {
 			return 0.001f;
 		}
+		default float getCreateFile() {
+			return 0.001f;
+		}
 		default float getCreateDirectory() {
 			return 0.001f;
 		}
@@ -146,6 +149,13 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		randomFail(failureProbabilities.getSize());
 		return super.size(path);
+	}
+
+	@Override
+	public Path createFile(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		randomFail(failureProbabilities.getCreateFile());
+		return super.createFile(path);
 	}
 
 	@Override

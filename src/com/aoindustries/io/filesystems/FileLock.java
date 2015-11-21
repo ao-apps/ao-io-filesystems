@@ -22,34 +22,28 @@
  */
 package com.aoindustries.io.filesystems;
 
-import java.nio.file.ReadOnlyFileSystemException;
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
- * Wraps a file system to make it read-only.
+ * A lock object obtained when a file is successfully lock.
+ *
+ * @see  FileSystem#lock()
  *
  * @author  AO Industries, Inc.
  */
-public class ReadOnlyFileSystem extends FileSystemWrapper {
+public interface FileLock extends Closeable {
 
-	public ReadOnlyFileSystem(FileSystem wrappedFileSystem) {
-		super(wrappedFileSystem);
-	}
+	/**
+	 * @see  java.nio.channels.FileLock#isValid()
+	 */
+	boolean isValid();
 
+	/**
+	 * Unlocks a file.  Will usually be called in a try/finally or try-with-resources block.
+	 * 
+	 * @see  #lock()
+	 */
 	@Override
-	public void delete(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
-
-	@Override
-	public Path createFile(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
-
-	@Override
-	public Path createDirectory(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
+	void close() throws IOException;
 }

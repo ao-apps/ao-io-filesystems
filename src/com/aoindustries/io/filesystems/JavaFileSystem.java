@@ -204,6 +204,13 @@ public class JavaFileSystem implements FileSystem {
 	}
 
 	@Override
+	public Path createFile(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		Files.createFile(getJavaPath(path));
+		return path;
+	}
+
+	@Override
 	public Path createDirectory(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		Files.createDirectory(getJavaPath(path));
