@@ -167,7 +167,7 @@ public class PathTest {
 	@Test
 	public void testToString_0args() {
 		System.out.println("toString");
-		assertEquals("", root.toString());
+		assertEquals("/", root.toString());
 		assertEquals("/bin", bin.toString());
 		assertEquals("/bin/bash", bash.toString());
 		assertEquals("/bin/cp", cp.toString());

@@ -79,9 +79,12 @@ public interface FileSystem {
 	 * @see Path#toString(java.lang.Appendable) for the inverse operation
 	 */
 	default Path parsePath(String value) throws InvalidPathException {
+		// Check for root
+		int len = value.length();
+		if(len == 1 && value.charAt(0) == Path.SEPARATOR) return new Path(this);
+		// Parse all others
 		Path p = null;
 		int lastSepPos = -1;
-		int len = value.length();
 		do {
 			int sepPos = value.indexOf(Path.SEPARATOR, lastSepPos + 1);
 			if(sepPos == -1) sepPos = len;

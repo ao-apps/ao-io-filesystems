@@ -41,7 +41,7 @@ import java.io.IOException;
  * </p>
  * <p>
  * The root path is an empty string (and the only path name that may be an empty
- * string).
+ * string).  In string form, the root path by itself is represented as "/".
  * </p>
  * <p>
  * Paths are case-sensitive, even on platforms that do otherwise.
@@ -52,6 +52,7 @@ import java.io.IOException;
 public class Path implements Comparable<Path> {
 
 	public static final char SEPARATOR = '/';
+	public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR);
 
 	private final FileSystem fileSystem;
 	private final Path parent;
@@ -198,42 +199,54 @@ public class Path implements Comparable<Path> {
 
 	/**
 	 * Gets a string representation of the path.
-	 * The root is the empty string.
+	 * The root is the separator by itself ("/").
 	 * 
 	 * @see #toString(java.lang.Appendable) for a possibly faster implementation
 	 * @see FileSystem#parsePath(java.lang.String) for the inverse operation
 	 */
 	@Override
 	public String toString() {
-		int totalLen = 0;
-		Path path = this;
-		do {
-			totalLen += path.name.length();
-			path = path.parent;
-			if(path != null) {
-				// Add room for the separator
-				totalLen++;
+		if(parent == null) {
+			return SEPARATOR_STRING;
+		} else {
+			int totalLen = 0;
+			Path path = this;
+			do {
+				totalLen += path.name.length();
+				path = path.parent;
+				if(path != null) {
+					// Add room for the separator
+					totalLen++;
+				}
+			} while(path != null);
+			StringBuilder buff = new StringBuilder(totalLen);
+			try {
+				toString(buff);
+			} catch(IOException e) {
+				throw new AssertionError("IOException should not happen with StringBuilder", e);
 			}
-		} while(path != null);
-		StringBuilder buff = new StringBuilder(totalLen);
-		try {
-			toString(buff);
-		} catch(IOException e) {
-			throw new AssertionError("IOException should not happen with StringBuilder", e);
+			assert buff.length() == totalLen : "StringBuffer preallocation inconsistent with resulting String length";
+			return buff.toString();
 		}
-		assert buff.length() == totalLen : "StringBuffer preallocation inconsistent with resulting String length";
-		return buff.toString();
 	}
 
 	/**
 	 * Gets a string representation of the path.
-	 * The root is the empty string.
+	 * The root is the separator by itself ("/").
 	 *
 	 * @see FileSystem#parsePath(java.lang.String) for the inverse operation
 	 */
 	public void toString(Appendable out) throws IOException {
+		if(parent == null) {
+			out.append(SEPARATOR);
+		} else {
+			toString0(out);
+		}
+	}
+	/** Recursive component of toString */
+	private void toString0(Appendable out) throws IOException {
 		if(parent != null) {
-			parent.toString(out);
+			parent.toString0(out);
 			out.append(SEPARATOR);
 		}
 		out.append(name);
