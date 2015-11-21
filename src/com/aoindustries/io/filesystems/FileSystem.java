@@ -111,7 +111,7 @@ public interface FileSystem {
 	 * @throws NotDirectoryException if the path is not a directory
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException;
+	PathIterator list(Path path) throws IOException;
 
 	/**
 	 * Deletes the file system object at the given path.
@@ -122,7 +122,7 @@ public interface FileSystem {
 	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException;
+	void delete(Path path) throws IOException;
 
 	/**
 	 * Gets the size of the file system object at the given path.
@@ -132,5 +132,29 @@ public interface FileSystem {
 	 * @throws NoSuchFileException if the path does not exist
 	 * @throws IOException if an underlying I/O error occurs.
 	 */
-	long size(Path path) throws NoSuchFileException, IOException;
+	long size(Path path) throws IOException;
+
+	/**
+	 * Atomically creates a directory (must not have already existed).
+	 * 
+	 * @return  returns the path
+	 * 
+	 * @throws UnsupportedOperationException if unable to create atomically
+	 * @throws FileAlreadyExistsException if file already exists
+	 * @throws IOException if an underlying I/O error occurs.
+	 */
+	Path createDirectory(Path path) throws IOException;
+
+	/**
+	 * Locks a file in exclusive mode.
+	 * File range and shared locks not currently supported.
+	 * The lock must be closed to unlock, usually in a try/finally or try-with-resources block.
+	 * The locks are not reentrant, attempting to obtain the lock from the same thread will result in deadlock.
+	 *
+	 * @throws NoSuchFileException if the path does not exist
+	 * @throws IOException if an underlying I/O error occurs.
+	 *
+	 * @see FileLock#close()
+	 */
+	FileLock lock(Path path) throws IOException;
 }

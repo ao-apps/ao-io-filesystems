@@ -23,8 +23,6 @@
 package com.aoindustries.io.filesystems;
 
 import com.aoindustries.lang.NotImplementedException;
-import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
@@ -98,13 +96,25 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
-	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new NotImplementedException("TODO");
 	}
 
 	@Override
-	public long size(Path path) throws NoSuchFileException, IOException {
+	public long size(Path path) {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
+	}
+
+	@Override
+	public Path createDirectory(Path path) {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new NotImplementedException("TODO");
+	}
+
+	@Override
+	public FileLock lock(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		throw new NotImplementedException("TODO");
 	}

@@ -24,9 +24,6 @@ package com.aoindustries.io.filesystems;
 
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -49,39 +46,40 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		}
 	}
 
-	/**
-	 * Default probabilities
-	 */
-	public static final float
-		DEFAULT_LIST_FAILURE_PROBABILITY = 0.001f,
-		DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY = 0.0001f,
-		DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY = 0.001f,
-		DEFAULT_UNLINK_FAILURE_PROBABILITY = 0.001f,
-		DEFAULT_SIZE_FAILURE_PROBABILITY = 0.001f
-	;
+	public static interface FailureProbabilities {
+		default float getList() {
+			return 0.001f;
+		}
+		default float getListIterate() {
+			return 0.0001f;
+		}
+		default float getListIterateClose() {
+			return 0.001f;
+		}
+		default float getUnlink() {
+			return 0.001f;
+		}
+		default float getSize() {
+			return 0.001f;
+		}
+		default float getCreateDirectory() {
+			return 0.001f;
+		}
+		default float getLock() {
+			return 0.0001f;
+		}
+	}
 
-	private final float listFailureProbability;
-	private final float listIterateFailureProbability;
-	private final float listIterateCloseFailureProbability;
-	private final float unlinkFailureProbability;
-	private final float sizeFailureProbability;
+	private final FailureProbabilities failureProbabilities;
 	private final Random random;
 
 	public RandomFailFileSystem(
 		FileSystem wrappedFileSystem,
-		float listFailureProbability,
-		float listIterateFailureProbability,
-		float listIterateCloseFailureProbability,
-		float unlinkFailureProbability,
-		float sizeFailureProbability,
+		FailureProbabilities failureProbabilities,
 		Random random
 	) {
 		super(wrappedFileSystem);
-		this.listFailureProbability = listFailureProbability;
-		this.listIterateFailureProbability = listIterateFailureProbability;
-		this.listIterateCloseFailureProbability = listIterateCloseFailureProbability;
-		this.unlinkFailureProbability = unlinkFailureProbability;
-		this.sizeFailureProbability = sizeFailureProbability;
+		this.failureProbabilities = failureProbabilities;
 		this.random = random;
 	}
 
@@ -93,11 +91,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	public RandomFailFileSystem(FileSystem wrappedFileSystem) {
 		this(
 			wrappedFileSystem,
-			DEFAULT_LIST_FAILURE_PROBABILITY,
-			DEFAULT_LIST_ITERATE_FAILURE_PROBABILITY,
-			DEFAULT_LIST_ITERATE_CLOSE_FAILURE_PROBABILITY,
-			DEFAULT_UNLINK_FAILURE_PROBABILITY,
-			DEFAULT_SIZE_FAILURE_PROBABILITY,
+			new FailureProbabilities() {},
 			new SecureRandom()
 		);
 	}
@@ -118,15 +112,15 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	 * Random chance of fail on list as well as list iteration.
 	 */
 	@Override
-	public PathIterator list(Path path) throws RandomFailIOException, NoSuchFileException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws RandomFailIOException, IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(listFailureProbability);
+		randomFail(failureProbabilities.getList());
 		PathWrapper pathWrapper = (PathWrapper)path;
 		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath)) {
 			@Override
 			public boolean hasNext() throws DirectoryIteratorException {
 				try {
-					randomFail(listIterateFailureProbability);
+					randomFail(failureProbabilities.getListIterate());
 				} catch(RandomFailIOException e) {
 					throw new DirectoryIteratorException(e);
 				}
@@ -134,23 +128,37 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 			}
 			@Override
 			public void close() throws RandomFailIOException, IOException {
-				randomFail(listIterateCloseFailureProbability);
+				randomFail(failureProbabilities.getListIterateClose());
 				super.close();
 			}
 		};
 	}
 
 	@Override
-	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(unlinkFailureProbability);
+		randomFail(failureProbabilities.getUnlink());
 		super.delete(path);
 	}
 
 	@Override
-	public long size(Path path) throws NoSuchFileException, IOException {
+	public long size(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(sizeFailureProbability);
+		randomFail(failureProbabilities.getSize());
 		return super.size(path);
+	}
+
+	@Override
+	public Path createDirectory(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		randomFail(failureProbabilities.getCreateDirectory());
+		return super.createDirectory(path);
+	}
+
+	@Override
+	public FileLock lock(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		randomFail(failureProbabilities.getLock());
+		return super.lock(path);
 	}
 }

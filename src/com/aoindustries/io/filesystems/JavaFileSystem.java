@@ -23,12 +23,12 @@
 package com.aoindustries.io.filesystems;
 
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
+import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -149,7 +149,7 @@ public class JavaFileSystem implements FileSystem {
 	}
 
 	@Override
-	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		if(isSingleRoot || path.getParent() != null) {
 			DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(getJavaPath(path));
@@ -192,14 +192,38 @@ public class JavaFileSystem implements FileSystem {
 	}
 
 	@Override
-	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		Files.delete(getJavaPath(path));
 	}
 
 	@Override
-	public long size(Path path) throws NoSuchFileException, IOException {
+	public long size(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		return Files.size(getJavaPath(path));
+	}
+
+	@Override
+	public Path createDirectory(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		Files.createDirectory(getJavaPath(path));
+		return path;
+	}
+
+	@Override
+	public FileLock lock(Path path) throws IOException {
+		// Obtain lock
+		FileChannel channel = FileChannel.open(getJavaPath(path), StandardOpenOption.READ);
+		java.nio.channels.FileLock lock = channel.lock();
+		return new FileLock() {
+			@Override
+			public boolean isValid() {
+				return lock.isValid();
+			}
+			@Override
+			public void close() throws IOException {
+				channel.close();
+			}
+		};
 	}
 }

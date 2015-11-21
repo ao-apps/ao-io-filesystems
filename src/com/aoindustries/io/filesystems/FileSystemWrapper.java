@@ -24,9 +24,6 @@ package com.aoindustries.io.filesystems;
 
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
 
 /**
  * A file system that wraps another to intercept and otherwise modify interactions.
@@ -127,21 +124,34 @@ abstract public class FileSystemWrapper implements FileSystem {
 	}
 
 	@Override
-	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException, IOException {
+	public PathIterator list(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		PathWrapper pathWrapper = (PathWrapper)path;
 		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath));
 	}
 
 	@Override
-	public void delete(Path path) throws NoSuchFileException, DirectoryNotEmptyException, IOException {
+	public void delete(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		wrappedFileSystem.delete(unwrapPath(path));
 	}
 
 	@Override
-	public long size(Path path) throws NoSuchFileException, IOException {
+	public long size(Path path) throws IOException {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
 		return wrappedFileSystem.size(unwrapPath(path));
+	}
+
+	@Override
+	public Path createDirectory(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		wrappedFileSystem.createDirectory(unwrapPath(path));
+		return path;
+	}
+
+	@Override
+	public FileLock lock(Path path) throws IOException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		return wrappedFileSystem.lock(unwrapPath(path));
 	}
 }
