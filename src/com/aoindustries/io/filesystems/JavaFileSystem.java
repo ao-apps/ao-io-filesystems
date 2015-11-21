@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 /**
- * The file system implement by the Java runtime.
+ * Wraps any standard FileSystem implementation.
  * <p>
  * The system is treated as a single-root file system.  For Windows, this means
  * that <code>C:\</code> will become <code>/C:/</code>.
@@ -54,20 +54,21 @@ public class JavaFileSystem implements FileSystem {
 	 */
 	public static final int MAX_PATH_NAME_LENGTH = 255;
 
-	private static final JavaFileSystem instance = new JavaFileSystem();
+	private static final JavaFileSystem defaultInstance = new JavaFileSystem(FileSystems.getDefault());
 
 	/**
-	 * Only one instance is created.
+	 * Gets the wrapper for the default file system implement by the Java runtime,
+	 * only one instance is created.
 	 */
-	public static JavaFileSystem getInstance() {
-		return instance;
+	public static JavaFileSystem getDefault() {
+		return defaultInstance;
 	}
 
-	private static final java.nio.file.FileSystem javaFS = FileSystems.getDefault();
-
+	protected final java.nio.file.FileSystem javaFS;
 	protected final boolean isSingleRoot;
 
-	protected JavaFileSystem() {
+	public JavaFileSystem(java.nio.file.FileSystem javaFS) {
+		this.javaFS = javaFS;
 		Iterator<java.nio.file.Path> roots = javaFS.getRootDirectories().iterator();
 		if(!roots.hasNext()) throw new AssertionError("No root");
 		java.nio.file.Path root = roots.next();
