@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2017  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -26,7 +26,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * A lock object obtained when a file is successfully lock.
+ * A lock object obtained when a file is successfully locked.
  *
  * @see  FileSystem#lock()
  *
