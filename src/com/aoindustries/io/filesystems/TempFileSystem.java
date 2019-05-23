@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2019  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -22,7 +22,6 @@
  */
 package com.aoindustries.io.filesystems;
 
-import com.aoindustries.lang.NotImplementedException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
@@ -96,32 +95,37 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void delete(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		throw new com.aoindustries.lang.NotImplementedException("TODO");
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public long size(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		throw new com.aoindustries.lang.NotImplementedException("TODO");
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public Path createFile(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		throw new com.aoindustries.lang.NotImplementedException("TODO");
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public Path createDirectory(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		throw new com.aoindustries.lang.NotImplementedException("TODO");
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public FileLock lock(Path path) {
 		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
+		throw new com.aoindustries.lang.NotImplementedException("TODO");
 	}
 }
