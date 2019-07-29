@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2019  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -86,6 +86,8 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		this.random = random;
 	}
 
+	private static final SecureRandom secureRandom = new SecureRandom();
+
 	/**
 	 * Uses default probabilities and a SecureRandom source.
 	 * 
@@ -95,7 +97,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		this(
 			wrappedFileSystem,
 			new FailureProbabilities() {},
-			new SecureRandom()
+			secureRandom
 		);
 	}
 
