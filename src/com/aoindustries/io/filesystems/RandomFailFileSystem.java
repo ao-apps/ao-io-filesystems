@@ -22,6 +22,7 @@
  */
 package com.aoindustries.io.filesystems;
 
+import com.aoindustries.io.IoUtils;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.security.SecureRandom;
@@ -86,10 +87,10 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		this.random = random;
 	}
 
-	private static final SecureRandom secureRandom = new SecureRandom();
+	private static final Random fastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(8)));
 
 	/**
-	 * Uses default probabilities and a SecureRandom source.
+	 * Uses default probabilities and a fast Random source.
 	 * 
 	 * @see SecureRandom
 	 */
@@ -97,7 +98,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 		this(
 			wrappedFileSystem,
 			new FailureProbabilities() {},
-			secureRandom
+			fastRandom
 		);
 	}
 
