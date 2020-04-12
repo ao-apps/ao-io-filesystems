@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2017  AO Industries, Inc.
+ * Copyright (C) 2015, 2017, 2020  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * A lock object obtained when a file is successfully locked.
  *
- * @see  FileSystem#lock()
+ * @see  FileSystem#lock(com.aoindustries.io.filesystems.Path)
  *
  * @author  AO Industries, Inc.
  */
@@ -42,7 +42,7 @@ public interface FileLock extends Closeable {
 	/**
 	 * Unlocks a file.  Will usually be called in a try/finally or try-with-resources block.
 	 * 
-	 * @see  #lock()
+	 * @see  FileSystem#lock(com.aoindustries.io.filesystems.Path)
 	 */
 	@Override
 	void close() throws IOException;

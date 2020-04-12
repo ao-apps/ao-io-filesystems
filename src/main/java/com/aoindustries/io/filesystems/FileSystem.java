@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2020  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -24,6 +24,7 @@ package com.aoindustries.io.filesystems;
 
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 
@@ -50,8 +51,7 @@ public interface FileSystem {
 	 * file system specific constraints.
 	 * The root path is never passed here.
 	 *
-	 * @param path The path to check, must be from this file system.
-	 * @return     The path, if it is acceptable
+	 * @param  name  The path to check, must be from this file system.
 	 * @throws InvalidPathException If the path is not acceptable
 	 */
 	void checkSubPath(Path parent, String name) throws InvalidPathException;
@@ -106,7 +106,7 @@ public interface FileSystem {
 	 * It is possible that paths may be returned that no longer exist.
 	 * It is also possible that new file system objects created after the beginning of iteration are not returned.
 	 *
-	 * @path  Must be from this file system.
+	 * @param  path  Must be from this file system.
 	 *
 	 * @return a read-only iterator of children
 	 * 
@@ -119,7 +119,7 @@ public interface FileSystem {
 	/**
 	 * Deletes the file system object at the given path.
 	 *
-	 * @path  Must be from this file system.
+	 * @param  path  Must be from this file system.
 	 *
 	 * @throws NoSuchFileException if the path does not exist
 	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
@@ -130,7 +130,7 @@ public interface FileSystem {
 	/**
 	 * Gets the size of the file system object at the given path.
 	 *
-	 * @path  Must be from this file system.
+	 * @param  path  Must be from this file system.
 	 *
 	 * @throws NoSuchFileException if the path does not exist
 	 * @throws IOException if an underlying I/O error occurs.
