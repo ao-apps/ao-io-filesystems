@@ -29,7 +29,7 @@ along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses />.
 		<relativePath>../ao-oss-parent/pom.xml</relativePath>
 	</parent>
 
-	<groupId>com.aoindustries</groupId><artifactId>ao-io-filesystems</artifactId><version>0.1.0</version>
+	<groupId>com.aoindustries</groupId><artifactId>ao-io-filesystems</artifactId><version>0.1.0-POST-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -52,7 +52,7 @@ along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses />.
 		<connection>scm:git:git://github.com/aoindustries/ao-io-filesystems.git</connection>
 		<developerConnection>scm:git:git@github.com:aoindustries/ao-io-filesystems.git</developerConnection>
 		<url>https://github.com/aoindustries/ao-io-filesystems</url>
-		<tag>ao-io-filesystems-0.1.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
