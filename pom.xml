@@ -40,7 +40,7 @@ along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses />.
 			</ul>
 		</div>]]></javadoc.modules>
 		<!-- Dependencies -->
-		<commons-lang3.version>3.10</commons-lang3.version>
+		<commons-lang3.version>3.11</commons-lang3.version>
 	</properties>
 
 	<name>AO IO Filesystems</name>
