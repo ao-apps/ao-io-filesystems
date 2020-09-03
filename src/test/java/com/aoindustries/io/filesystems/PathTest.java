@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2020  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -22,12 +22,13 @@
  */
 package com.aoindustries.io.filesystems;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author  AO Industries, Inc.
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class PathTest {
 	
 	public PathTest() {
@@ -46,20 +47,24 @@ public class PathTest {
 	 * Test constructor checks.
 	 */
 	@Test(expected = InvalidPathException.class)
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testInitNullParent() {
 		System.out.println("<init>");
 		new Path(null, "");
 	}
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testInitNullName() {
 		System.out.println("<init>");
 		new Path(root, null);
 	}
 	@Test(expected = InvalidPathException.class)
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testInitEmpty() {
 		System.out.println("<init>");
 		new Path(root, "");
 	}
 	@Test(expected = InvalidPathException.class)
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testInitSlash() {
 		System.out.println("<init>");
 		new Path(root, "test" + Path.SEPARATOR);
