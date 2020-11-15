@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2020  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -22,6 +22,8 @@
  */
 package com.aoindustries.io.filesystems;
 
+import com.aoindustries.lang.Throwables;
+
 /**
  * Thrown when an invalid path is created, or when a path is invalid for
  * a given file system.
@@ -34,5 +36,15 @@ public class InvalidPathException extends IllegalArgumentException {
 
 	public InvalidPathException(String message) {
 		super(message);
+	}
+
+	public InvalidPathException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	static {
+		Throwables.registerSurrogateFactory(InvalidPathException.class, (template, cause) ->
+			new InvalidPathException(template.getMessage(), cause)
+		);
 	}
 }

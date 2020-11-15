@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2019  AO Industries, Inc.
+ * Copyright (C) 2015, 2019, 2020  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -23,6 +23,7 @@
 package com.aoindustries.io.filesystems;
 
 import com.aoindustries.io.IoUtils;
+import com.aoindustries.lang.Throwables;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.security.SecureRandom;
@@ -40,10 +41,33 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	 * Thrown when a failure occurs randomly.
 	 */
 	public static class RandomFailIOException extends IOException {
+
 		private static final long serialVersionUID = 1L;
 		
+		private final float probability;
+
 		private RandomFailIOException(float probability) {
-			super("Random Fail: probability = " + probability);
+			this.probability = probability;
+		}
+
+		private RandomFailIOException(float probability, Throwable cause) {
+			super(cause);
+			this.probability = probability;
+		}
+
+		public float getProbability() {
+			return probability;
+		}
+
+		@Override
+		public String getMessage() {
+			return "Random Fail: probability = " + probability;
+		}
+
+		static {
+			Throwables.registerSurrogateFactory(RandomFailIOException.class, (template, cause) ->
+				new RandomFailIOException(template.probability, cause)
+			);
 		}
 	}
 
