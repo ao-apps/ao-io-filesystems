@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2019, 2020  AO Industries, Inc.
+ * Copyright (C) 2015, 2019, 2020, 2021  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -20,10 +20,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aoindustries.io.filesystems;
+package com.aoapps.io.filesystems;
 
-import com.aoindustries.io.IoUtils;
-import com.aoindustries.lang.Throwables;
+import com.aoapps.lang.Throwables;
+import com.aoapps.lang.io.IoUtils;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.security.SecureRandom;

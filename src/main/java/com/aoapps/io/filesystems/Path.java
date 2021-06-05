@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015  AO Industries, Inc.
+ * Copyright (C) 2015, 2021  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aoindustries.io.filesystems;
+package com.aoapps.io.filesystems;
 
 import java.io.IOException;
 
@@ -77,7 +77,7 @@ public class Path implements Comparable<Path> {
 	 * @param  name        Must not be <code>""</code>.
 	 *                     Must not contain the <code>SEPARATOR</code> character.
 	 * 
-	 * @see FileSystem#checkSubPath(com.aoindustries.io.filesystems.Path, java.lang.String)
+	 * @see FileSystem#checkSubPath(com.aoapps.io.filesystems.Path, java.lang.String)
 	 *                     Each file system may impose additional path restrictions.
 	 */
 	public Path(Path parent, String name) throws InvalidPathException {
@@ -104,7 +104,7 @@ public class Path implements Comparable<Path> {
 	}
 
 	/**
-	 * @see #equals(com.aoindustries.io.filesystems.Path)
+	 * @see #equals(com.aoapps.io.filesystems.Path)
 	 */
 	@Override
 	public boolean equals(Object o) {

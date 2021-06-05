@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2020  AO Industries, Inc.
+ * Copyright (C) 2015, 2021  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -20,31 +20,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aoindustries.io.filesystems;
+package com.aoapps.io.filesystems;
 
-import com.aoindustries.lang.Throwables;
+import java.nio.file.ReadOnlyFileSystemException;
 
 /**
- * Thrown when an invalid path is created, or when a path is invalid for
- * a given file system.
+ * Wraps a file system to make it read-only.
  *
  * @author  AO Industries, Inc.
  */
-public class InvalidPathException extends IllegalArgumentException {
+public class ReadOnlyFileSystem extends FileSystemWrapper {
 
-	private static final long serialVersionUID = 1L;
-
-	public InvalidPathException(String message) {
-		super(message);
+	public ReadOnlyFileSystem(FileSystem wrappedFileSystem) {
+		super(wrappedFileSystem);
 	}
 
-	public InvalidPathException(String message, Throwable cause) {
-		super(message, cause);
+	@Override
+	public void delete(Path path) throws ReadOnlyFileSystemException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new ReadOnlyFileSystemException();
 	}
 
-	static {
-		Throwables.registerSurrogateFactory(InvalidPathException.class, (template, cause) ->
-			new InvalidPathException(template.getMessage(), cause)
-		);
+	@Override
+	public Path createFile(Path path) throws ReadOnlyFileSystemException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new ReadOnlyFileSystemException();
+	}
+
+	@Override
+	public Path createDirectory(Path path) throws ReadOnlyFileSystemException {
+		if(path.getFileSystem() != this) throw new IllegalArgumentException();
+		throw new ReadOnlyFileSystemException();
 	}
 }

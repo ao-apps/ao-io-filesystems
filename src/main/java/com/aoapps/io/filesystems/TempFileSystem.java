@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with ao-io-filesystems.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aoindustries.io.filesystems;
+package com.aoapps.io.filesystems;
 
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
