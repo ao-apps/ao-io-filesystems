@@ -30,7 +30,7 @@ import java.nio.file.DirectoryIteratorException;
  *
  * @author  AO Industries, Inc.
  */
-abstract public class FileSystemWrapper implements FileSystem {
+public abstract class FileSystemWrapper implements FileSystem {
 
 	protected static class PathWrapper extends Path {
 		protected final Path wrappedPath;

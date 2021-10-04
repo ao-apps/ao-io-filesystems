@@ -35,22 +35,22 @@ import java.util.Iterator;
  *
  * @author  AO Industries, Inc.
  */
-abstract public class PathIterator implements Iterator<Path>, Closeable {
+public abstract class PathIterator implements Iterator<Path>, Closeable {
 
 	/**
 	 * @throws DirectoryIteratorException when an underlying IOException has occurred.
 	 */
 	@Override
-	abstract public boolean hasNext() throws DirectoryIteratorException;
+	public abstract boolean hasNext() throws DirectoryIteratorException;
 
 	@Override
-	abstract public Path next();
+	public abstract Path next();
 
 	/**
 	 * The path iterators must be read-only.
 	 */
 	@Override
-	final public void remove() throws UnsupportedOperationException {
+	public final void remove() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
 }
