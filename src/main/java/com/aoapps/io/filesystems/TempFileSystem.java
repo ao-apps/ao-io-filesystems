@@ -84,7 +84,7 @@ public class TempFileSystem implements FileSystem {
 				return next < list.length;
 			}
 			@Override
-			public Path next() {
+			public Path next() throws NoSuchElementException {
 				if(next >= list.length) throw new NoSuchElementException();
 				return new Path(path, list[next++]);
 			}

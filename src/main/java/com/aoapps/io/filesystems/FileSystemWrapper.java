@@ -24,6 +24,7 @@ package com.aoapps.io.filesystems;
 
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
+import java.util.NoSuchElementException;
 
 /**
  * A file system that wraps another to intercept and otherwise modify interactions.
@@ -113,7 +114,7 @@ public abstract class FileSystemWrapper implements FileSystem {
 		}
 
 		@Override
-		public PathWrapper next() {
+		public PathWrapper next() throws NoSuchElementException {
 			return wrapSubPath(parent, wrappedIter.next());
 		}
 

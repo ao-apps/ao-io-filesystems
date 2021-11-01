@@ -26,6 +26,7 @@ import java.io.Closeable;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Iterates over paths, must be closed when done.
@@ -43,14 +44,11 @@ public abstract class PathIterator implements Iterator<Path>, Closeable {
 	@Override
 	public abstract boolean hasNext() throws DirectoryIteratorException;
 
-	@Override
-	public abstract Path next();
-
 	/**
 	 * The path iterators must be read-only.
 	 */
 	@Override
-	public final void remove() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+	public final void remove() {
+		Iterator.super.remove();
 	}
 }

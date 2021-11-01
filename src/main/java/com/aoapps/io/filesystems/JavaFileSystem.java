@@ -31,6 +31,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Wraps any standard FileSystem implementation.
@@ -161,7 +162,7 @@ public class JavaFileSystem implements FileSystem {
 					return iter.hasNext();
 				}
 				@Override
-				public Path next() {
+				public Path next() throws NoSuchElementException {
 					return new Path(path, iter.next().getFileName().toString());
 				}
 				@Override
@@ -179,7 +180,7 @@ public class JavaFileSystem implements FileSystem {
 					return rootIter.hasNext();
 				}
 				@Override
-				public Path next() {
+				public Path next() throws NoSuchElementException {
 					String rootStr = rootIter.next().toString();
 					if(!rootStr.endsWith(javaSeparator)) throw new AssertionError("Root does not end with separator: " + rootStr);
 					return new Path(path, rootStr.substring(0, rootStr.length() - javaSeparator.length()));
