@@ -43,7 +43,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	public static class RandomFailIOException extends IOException {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private final float probability;
 
 		private RandomFailIOException(float probability) {
@@ -99,30 +99,34 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	}
 
 	private final FailureProbabilities failureProbabilities;
-	private final Random random;
+	private final Random fastRandom;
 
+	/**
+	 * @param  fastRandom  A fast pseudo-random number generator for non-cryptographic purposes.
+	 */
 	public RandomFailFileSystem(
 		FileSystem wrappedFileSystem,
 		FailureProbabilities failureProbabilities,
-		Random random
+		Random fastRandom
 	) {
 		super(wrappedFileSystem);
 		this.failureProbabilities = failureProbabilities;
-		this.random = random;
+		this.fastRandom = fastRandom;
 	}
 
-	private static final Random fastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(8)));
+	/**
+	 * A fast pseudo-random number generator for non-cryptographic purposes.
+	 */
+	private static final Random defaultFastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(Long.BYTES)));
 
 	/**
-	 * Uses default probabilities and a fast Random source.
-	 * 
-	 * @see SecureRandom
+	 * Uses default probabilities and a default fast pseudo-random number generator for non-cryptographic purposes.
 	 */
 	public RandomFailFileSystem(FileSystem wrappedFileSystem) {
 		this(
 			wrappedFileSystem,
 			new FailureProbabilities() {},
-			fastRandom
+			defaultFastRandom
 		);
 	}
 
@@ -131,7 +135,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 			probability > 0
 			&& (
 				probability >= 1
-				|| random.nextFloat() < probability
+				|| fastRandom.nextFloat() < probability
 			)
 		) {
 			throw new RandomFailIOException(probability);
