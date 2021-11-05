@@ -26,7 +26,6 @@ import java.io.Closeable;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Iterates over paths, must be closed when done.
