@@ -30,10 +30,7 @@ import org.junit.Test;
  */
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class PathTest {
-	
-	public PathTest() {
-	}
-	
+
 	private final TempFileSystem tempfs = new TempFileSystem();
 	private final Path root = new Path(tempfs);
 	private final Path bin = new Path(root, "bin");
@@ -248,7 +245,7 @@ public class PathTest {
 	public void testExplode_0args() {
 		System.out.println("explode");
 		assertArrayEquals(
-			new String[] {},
+			new String[0],
 			root.explode()
 		);
 		assertArrayEquals(

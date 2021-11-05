@@ -125,7 +125,9 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 	public RandomFailFileSystem(FileSystem wrappedFileSystem) {
 		this(
 			wrappedFileSystem,
-			new FailureProbabilities() {},
+			new FailureProbabilities() {
+				// All defaults
+			},
 			defaultFastRandom
 		);
 	}

@@ -38,6 +38,7 @@ import org.apache.commons.lang3.NotImplementedException;
 public class TempFileSystem implements FileSystem {
 
 	protected abstract static class FileSystemObject {
+		// TODO
 	}
 
 	private static class Directory extends FileSystemObject {
@@ -48,6 +49,7 @@ public class TempFileSystem implements FileSystem {
 	}
 
 	private static class RegularFile extends FileSystemObject {
+		// TODO
 	}
 
 	protected final Map<Path, FileSystemObject> files = new HashMap<>();
