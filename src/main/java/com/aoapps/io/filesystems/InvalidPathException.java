@@ -33,19 +33,19 @@ import com.aoapps.lang.Throwables;
  */
 public class InvalidPathException extends IllegalArgumentException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public InvalidPathException(String message) {
-		super(message);
-	}
+  public InvalidPathException(String message) {
+    super(message);
+  }
 
-	public InvalidPathException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public InvalidPathException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-	static {
-		Throwables.registerSurrogateFactory(InvalidPathException.class, (template, cause) ->
-			new InvalidPathException(template.getMessage(), cause)
-		);
-	}
+  static {
+    Throwables.registerSurrogateFactory(InvalidPathException.class, (template, cause) ->
+      new InvalidPathException(template.getMessage(), cause)
+    );
+  }
 }

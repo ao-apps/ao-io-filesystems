@@ -35,16 +35,16 @@ import java.io.IOException;
  */
 public interface FileLock extends Closeable {
 
-	/**
-	 * @see  java.nio.channels.FileLock#isValid()
-	 */
-	boolean isValid();
+  /**
+   * @see  java.nio.channels.FileLock#isValid()
+   */
+  boolean isValid();
 
-	/**
-	 * Unlocks a file.  Will usually be called in a try/finally or try-with-resources block.
-	 * 
-	 * @see  FileSystem#lock(com.aoapps.io.filesystems.Path)
-	 */
-	@Override
-	void close() throws IOException;
+  /**
+   * Unlocks a file.  Will usually be called in a try/finally or try-with-resources block.
+   * 
+   * @see  FileSystem#lock(com.aoapps.io.filesystems.Path)
+   */
+  @Override
+  void close() throws IOException;
 }

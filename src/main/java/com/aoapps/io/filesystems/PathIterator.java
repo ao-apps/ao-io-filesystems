@@ -38,17 +38,17 @@ import java.util.Iterator;
  */
 public abstract class PathIterator implements Iterator<Path>, Closeable {
 
-	/**
-	 * @throws DirectoryIteratorException when an underlying IOException has occurred.
-	 */
-	@Override
-	public abstract boolean hasNext() throws DirectoryIteratorException;
+  /**
+   * @throws DirectoryIteratorException when an underlying IOException has occurred.
+   */
+  @Override
+  public abstract boolean hasNext() throws DirectoryIteratorException;
 
-	/**
-	 * The path iterators must be read-only.
-	 */
-	@Override
-	public final void remove() {
-		Iterator.super.remove();
-	}
+  /**
+   * The path iterators must be read-only.
+   */
+  @Override
+  public final void remove() {
+    Iterator.super.remove();
+  }
 }

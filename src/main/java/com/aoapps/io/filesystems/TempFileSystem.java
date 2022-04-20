@@ -38,93 +38,113 @@ import org.apache.commons.lang3.NotImplementedException;
  */
 public class TempFileSystem implements FileSystem {
 
-	protected abstract static class FileSystemObject {
-		// TODO
-	}
+  protected abstract static class FileSystemObject {
+    // TODO
+  }
 
-	private static class Directory extends FileSystemObject {
-		private final LinkedList<String> files = new LinkedList<>();
-		private String[] list() {
-			return files.toArray(new String[files.size()]);
-		}
-	}
+  private static class Directory extends FileSystemObject {
+    private final LinkedList<String> files = new LinkedList<>();
+    private String[] list() {
+      return files.toArray(new String[files.size()]);
+    }
+  }
 
-	private static class RegularFile extends FileSystemObject {
-		// TODO
-	}
+  private static class RegularFile extends FileSystemObject {
+    // TODO
+  }
 
-	protected final Map<Path, FileSystemObject> files = new HashMap<>();
+  protected final Map<Path, FileSystemObject> files = new HashMap<>();
 
-	public TempFileSystem() {
-		synchronized(files) {
-			files.put(new Path(this), new Directory());
-		}
-	}
+  public TempFileSystem() {
+    synchronized (files) {
+      files.put(new Path(this), new Directory());
+    }
+  }
 
-	/**
-	 * Temporary file systems support all possible paths.
-	 */
-	@Override
-	public void checkSubPath(Path parent, String name) {
-		if(parent.getFileSystem() != this) throw new IllegalArgumentException();
-		// All allowed
-	}
+  /**
+   * Temporary file systems support all possible paths.
+   */
+  @Override
+  public void checkSubPath(Path parent, String name) {
+    if (parent.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    // All allowed
+  }
 
-	@Override
-	public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		String[] list;
-		synchronized(files) {
-			FileSystemObject file = files.get(path);
-			if(file == null) throw new NoSuchFileException(path.toString());
-			if(!(file instanceof Directory)) throw new NotDirectoryException(path.toString());
-			list = ((Directory)file).list();
-		}
-		return new PathIterator() {
-			private int next = 0;
-			@Override
-			public boolean hasNext() {
-				return next < list.length;
-			}
-			@Override
-			public Path next() throws NoSuchElementException {
-				if(next >= list.length) throw new NoSuchElementException();
-				return new Path(path, list[next++]);
-			}
-			@Override
-			public void close() {
-				// Nothing to do
-			}
-		};
-	}
+  @Override
+  public PathIterator list(Path path) throws NoSuchFileException, NotDirectoryException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    String[] list;
+    synchronized (files) {
+      FileSystemObject file = files.get(path);
+      if (file == null) {
+        throw new NoSuchFileException(path.toString());
+      }
+      if (!(file instanceof Directory)) {
+        throw new NotDirectoryException(path.toString());
+      }
+      list = ((Directory)file).list();
+    }
+    return new PathIterator() {
+      private int next = 0;
+      @Override
+      public boolean hasNext() {
+        return next < list.length;
+      }
+      @Override
+      public Path next() throws NoSuchElementException {
+        if (next >= list.length) {
+          throw new NoSuchElementException();
+        }
+        return new Path(path, list[next++]);
+      }
+      @Override
+      public void close() {
+        // Nothing to do
+      }
+    };
+  }
 
-	@Override
-	public void delete(Path path) {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
-	}
+  @Override
+  public void delete(Path path) {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new NotImplementedException("TODO");
+  }
 
-	@Override
-	public long size(Path path) {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
-	}
+  @Override
+  public long size(Path path) {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new NotImplementedException("TODO");
+  }
 
-	@Override
-	public Path createFile(Path path) {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
-	}
+  @Override
+  public Path createFile(Path path) {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new NotImplementedException("TODO");
+  }
 
-	@Override
-	public Path createDirectory(Path path) {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
-	}
+  @Override
+  public Path createDirectory(Path path) {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new NotImplementedException("TODO");
+  }
 
-	@Override
-	public FileLock lock(Path path) {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new NotImplementedException("TODO");
-	}
+  @Override
+  public FileLock lock(Path path) {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new NotImplementedException("TODO");
+  }
 }

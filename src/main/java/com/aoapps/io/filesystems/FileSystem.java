@@ -46,130 +46,138 @@ import java.nio.file.NotDirectoryException;
  */
 public interface FileSystem {
 
-	/**
-	 * Checks that a given path name is acceptable to this file system.
-	 * Regular path rules are already checked, this is for additional
-	 * file system specific constraints.
-	 * The root path is never passed here.
-	 *
-	 * @param  name  The path to check, must be from this file system.
-	 * @throws InvalidPathException If the path is not acceptable
-	 */
-	void checkSubPath(Path parent, String name) throws InvalidPathException;
+  /**
+   * Checks that a given path name is acceptable to this file system.
+   * Regular path rules are already checked, this is for additional
+   * file system specific constraints.
+   * The root path is never passed here.
+   *
+   * @param  name  The path to check, must be from this file system.
+   * @throws InvalidPathException If the path is not acceptable
+   */
+  void checkSubPath(Path parent, String name) throws InvalidPathException;
 
-	/**
-	 * Joins the array of names to a path object.
-	 * Stops at the end of the array or the first <code>null</code> element.
-	 *
-	 * @see Path#explode() for the inverse operation
-	 * @see Path#explode(java.lang.String[]) for the inverse operation
-	 */
-	default Path join(String[] names) throws InvalidPathException {
-		Path p = new Path(this);
-		for(String name : names) {
-			if(name == null) break;
-			p = new Path(p, name);
-		}
-		return p;
-	}
+  /**
+   * Joins the array of names to a path object.
+   * Stops at the end of the array or the first <code>null</code> element.
+   *
+   * @see Path#explode() for the inverse operation
+   * @see Path#explode(java.lang.String[]) for the inverse operation
+   */
+  default Path join(String[] names) throws InvalidPathException {
+    Path p = new Path(this);
+    for (String name : names) {
+      if (name == null) {
+        break;
+      }
+      p = new Path(p, name);
+    }
+    return p;
+  }
 
-	/**
-	 * Parses a string representation of a path.
-	 *
-	 * @see Path#toString() for the inverse operation
-	 * @see Path#toString(java.lang.Appendable) for the inverse operation
-	 */
-	default Path parsePath(String value) throws InvalidPathException {
-		// Check for root
-		int len = value.length();
-		if(len == 1 && value.charAt(0) == Path.SEPARATOR) return new Path(this);
-		// Parse all others
-		Path p = null;
-		int lastSepPos = -1;
-		do {
-			int sepPos = value.indexOf(Path.SEPARATOR, lastSepPos + 1);
-			if(sepPos == -1) sepPos = len;
-			String name = value.substring(lastSepPos + 1, sepPos);
-			if(p == null) {
-				// root must have empty name
-				if(!name.isEmpty()) throw new InvalidPathException("Non-empty root name: " + name);
-				p = new Path(this);
-			} else {
-				p = new Path(p, name);
-			}
-			lastSepPos = sepPos;
-		} while(lastSepPos < len);
-		return p;
-	}
+  /**
+   * Parses a string representation of a path.
+   *
+   * @see Path#toString() for the inverse operation
+   * @see Path#toString(java.lang.Appendable) for the inverse operation
+   */
+  default Path parsePath(String value) throws InvalidPathException {
+    // Check for root
+    int len = value.length();
+    if (len == 1 && value.charAt(0) == Path.SEPARATOR) {
+      return new Path(this);
+    }
+    // Parse all others
+    Path p = null;
+    int lastSepPos = -1;
+    do {
+      int sepPos = value.indexOf(Path.SEPARATOR, lastSepPos + 1);
+      if (sepPos == -1) {
+        sepPos = len;
+      }
+      String name = value.substring(lastSepPos + 1, sepPos);
+      if (p == null) {
+        // root must have empty name
+        if (!name.isEmpty()) {
+          throw new InvalidPathException("Non-empty root name: " + name);
+        }
+        p = new Path(this);
+      } else {
+        p = new Path(p, name);
+      }
+      lastSepPos = sepPos;
+    } while (lastSepPos < len);
+    return p;
+  }
 
-	/**
-	 * Lists the children of the given path in no specific order.
-	 * It is possible that paths may be returned that no longer exist.
-	 * It is also possible that new file system objects created after the beginning of iteration are not returned.
-	 *
-	 * @param  path  Must be from this file system.
-	 *
-	 * @return a read-only iterator of children
-	 * 
-	 * @throws NoSuchFileException if the path does not exist
-	 * @throws NotDirectoryException if the path is not a directory
-	 * @throws IOException if an underlying I/O error occurs.
-	 */
-	PathIterator list(Path path) throws IOException;
+  /**
+   * Lists the children of the given path in no specific order.
+   * It is possible that paths may be returned that no longer exist.
+   * It is also possible that new file system objects created after the beginning of iteration are not returned.
+   *
+   * @param  path  Must be from this file system.
+   *
+   * @return a read-only iterator of children
+   *
+   * @throws NoSuchFileException if the path does not exist
+   * @throws NotDirectoryException if the path is not a directory
+   * @throws IOException if an underlying I/O error occurs.
+   */
+  PathIterator list(Path path) throws IOException;
 
-	/**
-	 * Deletes the file system object at the given path.
-	 *
-	 * @param  path  Must be from this file system.
-	 *
-	 * @throws NoSuchFileException if the path does not exist
-	 * @throws DirectoryNotEmptyException if the path is a directory and is not empty
-	 * @throws IOException if an underlying I/O error occurs.
-	 */
-	void delete(Path path) throws IOException;
+  /**
+   * Deletes the file system object at the given path.
+   *
+   * @param  path  Must be from this file system.
+   *
+   * @throws NoSuchFileException if the path does not exist
+   * @throws DirectoryNotEmptyException if the path is a directory and is not empty
+   * @throws IOException if an underlying I/O error occurs.
+   */
+  void delete(Path path) throws IOException;
 
-	/**
-	 * Gets the size of the file system object at the given path.
-	 *
-	 * @param  path  Must be from this file system.
-	 *
-	 * @throws NoSuchFileException if the path does not exist
-	 * @throws IOException if an underlying I/O error occurs.
-	 */
-	long size(Path path) throws IOException;
+  /**
+   * Gets the size of the file system object at the given path.
+   *
+   * @param  path  Must be from this file system.
+   *
+   * @throws NoSuchFileException if the path does not exist
+   * @throws IOException if an underlying I/O error occurs.
+   */
+  long size(Path path) throws IOException;
 
-	/**
-	 * Atomically creates an empty file (must not have already existed).
-	 *
-	 * @return  returns the path
-	 *
-	 * @throws UnsupportedOperationException if unable to create atomically
-	 * @throws FileAlreadyExistsException if file already exists
-	 * @throws IOException if an underlying I/O error occurs.
-	 */
-	Path createFile(Path path) throws IOException;
+  /**
+   * Atomically creates an empty file (must not have already existed).
+   *
+   * @return  returns the path
+   *
+   * @throws UnsupportedOperationException if unable to create atomically
+   * @throws FileAlreadyExistsException if file already exists
+   * @throws IOException if an underlying I/O error occurs.
+   */
+  Path createFile(Path path) throws IOException;
 
-	/**
-	 * Atomically creates a directory (must not have already existed).
-	 *
-	 * @return  returns the path
-	 *
-	 * @throws UnsupportedOperationException if unable to create atomically
-	 * @throws FileAlreadyExistsException if file already exists
-	 * @throws IOException if an underlying I/O error occurs.
-	 */
-	Path createDirectory(Path path) throws IOException;
+  /**
+   * Atomically creates a directory (must not have already existed).
+   *
+   * @return  returns the path
+   *
+   * @throws UnsupportedOperationException if unable to create atomically
+   * @throws FileAlreadyExistsException if file already exists
+   * @throws IOException if an underlying I/O error occurs.
+   */
+  Path createDirectory(Path path) throws IOException;
 
-	/**
-	 * Locks a file in exclusive mode.
-	 * File range and shared locks not currently supported.
-	 * The lock must be closed to unlock, usually in a try/finally or try-with-resources block.
-	 * The locks are not reentrant, attempting to obtain the lock from the same thread will result in deadlock.
-	 *
-	 * @throws NoSuchFileException if the path does not exist
-	 * @throws IOException if an underlying I/O error occurs.
-	 *
-	 * @see FileLock#close()
-	 */
-	FileLock lock(Path path) throws IOException;
+  /**
+   * Locks a file in exclusive mode.
+   * File range and shared locks not currently supported.
+   * The lock must be closed to unlock, usually in a try/finally or try-with-resources block.
+   * The locks are not reentrant, attempting to obtain the lock from the same thread will result in deadlock.
+   *
+   * @throws NoSuchFileException if the path does not exist
+   * @throws IOException if an underlying I/O error occurs.
+   *
+   * @see FileLock#close()
+   */
+  FileLock lock(Path path) throws IOException;
 }

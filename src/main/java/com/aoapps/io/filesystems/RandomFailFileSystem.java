@@ -38,171 +38,183 @@ import java.util.Random;
  */
 public class RandomFailFileSystem extends FileSystemWrapper {
 
-	/**
-	 * Thrown when a failure occurs randomly.
-	 */
-	public static class RandomFailIOException extends IOException {
+  /**
+   * Thrown when a failure occurs randomly.
+   */
+  public static class RandomFailIOException extends IOException {
 
-		private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-		private final float probability;
+    private final float probability;
 
-		private RandomFailIOException(float probability) {
-			this.probability = probability;
-		}
+    private RandomFailIOException(float probability) {
+      this.probability = probability;
+    }
 
-		private RandomFailIOException(float probability, Throwable cause) {
-			super(cause);
-			this.probability = probability;
-		}
+    private RandomFailIOException(float probability, Throwable cause) {
+      super(cause);
+      this.probability = probability;
+    }
 
-		public float getProbability() {
-			return probability;
-		}
+    public float getProbability() {
+      return probability;
+    }
 
-		@Override
-		public String getMessage() {
-			return "Random Fail: probability = " + probability;
-		}
+    @Override
+    public String getMessage() {
+      return "Random Fail: probability = " + probability;
+    }
 
-		static {
-			Throwables.registerSurrogateFactory(RandomFailIOException.class, (template, cause) ->
-				new RandomFailIOException(template.probability, cause)
-			);
-		}
-	}
+    static {
+      Throwables.registerSurrogateFactory(RandomFailIOException.class, (template, cause) ->
+        new RandomFailIOException(template.probability, cause)
+      );
+    }
+  }
 
-	public static interface FailureProbabilities {
-		default float getList() {
-			return 0.001f;
-		}
-		default float getListIterate() {
-			return 0.0001f;
-		}
-		default float getListIterateClose() {
-			return 0.001f;
-		}
-		default float getUnlink() {
-			return 0.001f;
-		}
-		default float getSize() {
-			return 0.001f;
-		}
-		default float getCreateFile() {
-			return 0.001f;
-		}
-		default float getCreateDirectory() {
-			return 0.001f;
-		}
-		default float getLock() {
-			return 0.0001f;
-		}
-	}
+  public static interface FailureProbabilities {
+    default float getList() {
+      return 0.001f;
+    }
+    default float getListIterate() {
+      return 0.0001f;
+    }
+    default float getListIterateClose() {
+      return 0.001f;
+    }
+    default float getUnlink() {
+      return 0.001f;
+    }
+    default float getSize() {
+      return 0.001f;
+    }
+    default float getCreateFile() {
+      return 0.001f;
+    }
+    default float getCreateDirectory() {
+      return 0.001f;
+    }
+    default float getLock() {
+      return 0.0001f;
+    }
+  }
 
-	private final FailureProbabilities failureProbabilities;
-	private final Random fastRandom;
+  private final FailureProbabilities failureProbabilities;
+  private final Random fastRandom;
 
-	/**
-	 * @param  fastRandom  A fast pseudo-random number generator for non-cryptographic purposes.
-	 */
-	public RandomFailFileSystem(
-		FileSystem wrappedFileSystem,
-		FailureProbabilities failureProbabilities,
-		Random fastRandom
-	) {
-		super(wrappedFileSystem);
-		this.failureProbabilities = failureProbabilities;
-		this.fastRandom = fastRandom;
-	}
+  /**
+   * @param  fastRandom  A fast pseudo-random number generator for non-cryptographic purposes.
+   */
+  public RandomFailFileSystem(
+    FileSystem wrappedFileSystem,
+    FailureProbabilities failureProbabilities,
+    Random fastRandom
+  ) {
+    super(wrappedFileSystem);
+    this.failureProbabilities = failureProbabilities;
+    this.fastRandom = fastRandom;
+  }
 
-	/**
-	 * A fast pseudo-random number generator for non-cryptographic purposes.
-	 */
-	private static final Random defaultFastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(Long.BYTES)));
+  /**
+   * A fast pseudo-random number generator for non-cryptographic purposes.
+   */
+  private static final Random defaultFastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(Long.BYTES)));
 
-	/**
-	 * Uses default probabilities and a default fast pseudo-random number generator for non-cryptographic purposes.
-	 */
-	public RandomFailFileSystem(FileSystem wrappedFileSystem) {
-		this(
-			wrappedFileSystem,
-			new FailureProbabilities() {
-				// All defaults
-			},
-			defaultFastRandom
-		);
-	}
+  /**
+   * Uses default probabilities and a default fast pseudo-random number generator for non-cryptographic purposes.
+   */
+  public RandomFailFileSystem(FileSystem wrappedFileSystem) {
+    this(
+      wrappedFileSystem,
+      new FailureProbabilities() {
+        // All defaults
+      },
+      defaultFastRandom
+    );
+  }
 
-	protected void randomFail(float probability) throws RandomFailIOException {
-		if(
-			probability > 0
-			&& (
-				probability >= 1
-				|| fastRandom.nextFloat() < probability
-			)
-		) {
-			throw new RandomFailIOException(probability);
-		}
-	}
+  protected void randomFail(float probability) throws RandomFailIOException {
+    if (
+      probability > 0
+      && (
+        probability >= 1
+        || fastRandom.nextFloat() < probability
+      )
+    ) {
+      throw new RandomFailIOException(probability);
+    }
+  }
 
-	/**
-	 * Random chance of fail on list as well as list iteration.
-	 */
-	@Override
-	public PathIterator list(Path path) throws RandomFailIOException, IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getList());
-		PathWrapper pathWrapper = (PathWrapper)path;
-		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath)) {
-			@Override
-			public boolean hasNext() throws DirectoryIteratorException {
-				try {
-					randomFail(failureProbabilities.getListIterate());
-				} catch(RandomFailIOException e) {
-					throw new DirectoryIteratorException(e);
-				}
-				return super.hasNext();
-			}
-			@Override
-			public void close() throws RandomFailIOException, IOException {
-				randomFail(failureProbabilities.getListIterateClose());
-				super.close();
-			}
-		};
-	}
+  /**
+   * Random chance of fail on list as well as list iteration.
+   */
+  @Override
+  public PathIterator list(Path path) throws RandomFailIOException, IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getList());
+    PathWrapper pathWrapper = (PathWrapper)path;
+    return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath)) {
+      @Override
+      public boolean hasNext() throws DirectoryIteratorException {
+        try {
+          randomFail(failureProbabilities.getListIterate());
+        } catch (RandomFailIOException e) {
+          throw new DirectoryIteratorException(e);
+        }
+        return super.hasNext();
+      }
+      @Override
+      public void close() throws RandomFailIOException, IOException {
+        randomFail(failureProbabilities.getListIterateClose());
+        super.close();
+      }
+    };
+  }
 
-	@Override
-	public void delete(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getUnlink());
-		super.delete(path);
-	}
+  @Override
+  public void delete(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getUnlink());
+    super.delete(path);
+  }
 
-	@Override
-	public long size(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getSize());
-		return super.size(path);
-	}
+  @Override
+  public long size(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getSize());
+    return super.size(path);
+  }
 
-	@Override
-	public Path createFile(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getCreateFile());
-		return super.createFile(path);
-	}
+  @Override
+  public Path createFile(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getCreateFile());
+    return super.createFile(path);
+  }
 
-	@Override
-	public Path createDirectory(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getCreateDirectory());
-		return super.createDirectory(path);
-	}
+  @Override
+  public Path createDirectory(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getCreateDirectory());
+    return super.createDirectory(path);
+  }
 
-	@Override
-	public FileLock lock(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		randomFail(failureProbabilities.getLock());
-		return super.lock(path);
-	}
+  @Override
+  public FileLock lock(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    randomFail(failureProbabilities.getLock());
+    return super.lock(path);
+  }
 }

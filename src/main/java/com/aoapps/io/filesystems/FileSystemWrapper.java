@@ -34,133 +34,147 @@ import java.util.NoSuchElementException;
  */
 public abstract class FileSystemWrapper implements FileSystem {
 
-	protected static class PathWrapper extends Path {
-		protected final Path wrappedPath;
-		/** Wraps a root */
-		private PathWrapper(FileSystemWrapper wrapper, Path wrappedRoot) {
-			super(wrapper);
-			this.wrappedPath = wrappedRoot;
-		}
-		/** Wraps a non-root */
-		private PathWrapper(PathWrapper parent, Path wrappedPath) {
-			super(parent, wrappedPath.getName());
-			assert parent.wrappedPath == wrappedPath.getParent();
-			this.wrappedPath = wrappedPath;
-		}
-	}
+  protected static class PathWrapper extends Path {
+    protected final Path wrappedPath;
+    /** Wraps a root */
+    private PathWrapper(FileSystemWrapper wrapper, Path wrappedRoot) {
+      super(wrapper);
+      this.wrappedPath = wrappedRoot;
+    }
+    /** Wraps a non-root */
+    private PathWrapper(PathWrapper parent, Path wrappedPath) {
+      super(parent, wrappedPath.getName());
+      assert parent.wrappedPath == wrappedPath.getParent();
+      this.wrappedPath = wrappedPath;
+    }
+  }
 
-	/**
-	 * Wraps a new sub path.
-	 */
-	protected PathWrapper wrapSubPath(PathWrapper parent, Path subPath) {
-		return new PathWrapper(parent, subPath);
-	}
+  /**
+   * Wraps a new sub path.
+   */
+  protected PathWrapper wrapSubPath(PathWrapper parent, Path subPath) {
+    return new PathWrapper(parent, subPath);
+  }
 
-	/**
-	 * Wraps a path.
-	 */
-	protected PathWrapper wrapPath(Path path) {
-		return
-			(path.getParent() == null)
-			? new PathWrapper(this, path)
-			: wrapSubPath(wrapPath(path.getParent()), path)
-		;
-	}
+  /**
+   * Wraps a path.
+   */
+  protected PathWrapper wrapPath(Path path) {
+    return
+      (path.getParent() == null)
+      ? new PathWrapper(this, path)
+      : wrapSubPath(wrapPath(path.getParent()), path)
+    ;
+  }
 
-	/**
-	 * Unwraps a path.
-	 */
-	protected Path unwrapPath(Path path) {
-		assert path.getFileSystem() == this;
-		Path wrappedPath = ((PathWrapper)path).wrappedPath;
-		assert wrappedPath.getFileSystem() == wrappedFileSystem;
-		return wrappedPath;
-	}
+  /**
+   * Unwraps a path.
+   */
+  protected Path unwrapPath(Path path) {
+    assert path.getFileSystem() == this;
+    Path wrappedPath = ((PathWrapper)path).wrappedPath;
+    assert wrappedPath.getFileSystem() == wrappedFileSystem;
+    return wrappedPath;
+  }
 
-	protected final FileSystem wrappedFileSystem;
+  protected final FileSystem wrappedFileSystem;
 
-	protected FileSystemWrapper(FileSystem wrappedFileSystem) {
-		this.wrappedFileSystem = wrappedFileSystem;
-	}
+  protected FileSystemWrapper(FileSystem wrappedFileSystem) {
+    this.wrappedFileSystem = wrappedFileSystem;
+  }
 
-	@Override
-	public void checkSubPath(Path parent, String name) throws InvalidPathException {
-		if(parent.getFileSystem() != this) throw new IllegalArgumentException();
-		wrappedFileSystem.checkSubPath(unwrapPath(parent), name);
-	}
+  @Override
+  public void checkSubPath(Path parent, String name) throws InvalidPathException {
+    if (parent.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    wrappedFileSystem.checkSubPath(unwrapPath(parent), name);
+  }
 
-	@Override
-	public Path join(String[] names) throws InvalidPathException {
-		return wrapPath(wrappedFileSystem.join(names));
-	}
+  @Override
+  public Path join(String[] names) throws InvalidPathException {
+    return wrapPath(wrappedFileSystem.join(names));
+  }
 
-	@Override
-	public Path parsePath(String value) throws InvalidPathException {
-		return wrapPath(wrappedFileSystem.parsePath(value));
-	}
+  @Override
+  public Path parsePath(String value) throws InvalidPathException {
+    return wrapPath(wrappedFileSystem.parsePath(value));
+  }
 
-	protected class PathIteratorWrapper extends PathIterator {
+  protected class PathIteratorWrapper extends PathIterator {
 
-		protected final PathWrapper parent;
-		protected final PathIterator wrappedIter;
+    protected final PathWrapper parent;
+    protected final PathIterator wrappedIter;
 
-		protected PathIteratorWrapper(PathWrapper parent, PathIterator wrappedIter) {
-			this.parent = parent;
-			this.wrappedIter = wrappedIter;
-		}
+    protected PathIteratorWrapper(PathWrapper parent, PathIterator wrappedIter) {
+      this.parent = parent;
+      this.wrappedIter = wrappedIter;
+    }
 
-		@Override
-		public boolean hasNext() throws DirectoryIteratorException {
-			return wrappedIter.hasNext();
-		}
+    @Override
+    public boolean hasNext() throws DirectoryIteratorException {
+      return wrappedIter.hasNext();
+    }
 
-		@Override
-		public PathWrapper next() throws NoSuchElementException {
-			return wrapSubPath(parent, wrappedIter.next());
-		}
+    @Override
+    public PathWrapper next() throws NoSuchElementException {
+      return wrapSubPath(parent, wrappedIter.next());
+    }
 
-		@Override
-		public void close() throws IOException {
-			wrappedIter.close();
-		}
-	}
+    @Override
+    public void close() throws IOException {
+      wrappedIter.close();
+    }
+  }
 
-	@Override
-	public PathIterator list(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		PathWrapper pathWrapper = (PathWrapper)path;
-		return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath));
-	}
+  @Override
+  public PathIterator list(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    PathWrapper pathWrapper = (PathWrapper)path;
+    return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath));
+  }
 
-	@Override
-	public void delete(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		wrappedFileSystem.delete(unwrapPath(path));
-	}
+  @Override
+  public void delete(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    wrappedFileSystem.delete(unwrapPath(path));
+  }
 
-	@Override
-	public long size(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		return wrappedFileSystem.size(unwrapPath(path));
-	}
+  @Override
+  public long size(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    return wrappedFileSystem.size(unwrapPath(path));
+  }
 
-	@Override
-	public Path createFile(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		wrappedFileSystem.createFile(unwrapPath(path));
-		return path;
-	}
+  @Override
+  public Path createFile(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    wrappedFileSystem.createFile(unwrapPath(path));
+    return path;
+  }
 
-	@Override
-	public Path createDirectory(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		wrappedFileSystem.createDirectory(unwrapPath(path));
-		return path;
-	}
+  @Override
+  public Path createDirectory(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    wrappedFileSystem.createDirectory(unwrapPath(path));
+    return path;
+  }
 
-	@Override
-	public FileLock lock(Path path) throws IOException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		return wrappedFileSystem.lock(unwrapPath(path));
-	}
+  @Override
+  public FileLock lock(Path path) throws IOException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    return wrappedFileSystem.lock(unwrapPath(path));
+  }
 }

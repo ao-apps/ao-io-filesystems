@@ -32,25 +32,31 @@ import java.nio.file.ReadOnlyFileSystemException;
  */
 public class ReadOnlyFileSystem extends FileSystemWrapper {
 
-	public ReadOnlyFileSystem(FileSystem wrappedFileSystem) {
-		super(wrappedFileSystem);
-	}
+  public ReadOnlyFileSystem(FileSystem wrappedFileSystem) {
+    super(wrappedFileSystem);
+  }
 
-	@Override
-	public void delete(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
+  @Override
+  public void delete(Path path) throws ReadOnlyFileSystemException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new ReadOnlyFileSystemException();
+  }
 
-	@Override
-	public Path createFile(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
+  @Override
+  public Path createFile(Path path) throws ReadOnlyFileSystemException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new ReadOnlyFileSystemException();
+  }
 
-	@Override
-	public Path createDirectory(Path path) throws ReadOnlyFileSystemException {
-		if(path.getFileSystem() != this) throw new IllegalArgumentException();
-		throw new ReadOnlyFileSystemException();
-	}
+  @Override
+  public Path createDirectory(Path path) throws ReadOnlyFileSystemException {
+    if (path.getFileSystem() != this) {
+      throw new IllegalArgumentException();
+    }
+    throw new ReadOnlyFileSystemException();
+  }
 }
