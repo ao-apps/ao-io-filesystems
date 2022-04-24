@@ -67,7 +67,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
 
     static {
       Throwables.registerSurrogateFactory(RandomFailIOException.class, (template, cause) ->
-        new RandomFailIOException(template.probability, cause)
+          new RandomFailIOException(template.probability, cause)
       );
     }
   }
@@ -76,24 +76,31 @@ public class RandomFailFileSystem extends FileSystemWrapper {
     default float getList() {
       return 0.001f;
     }
+
     default float getListIterate() {
       return 0.0001f;
     }
+
     default float getListIterateClose() {
       return 0.001f;
     }
+
     default float getUnlink() {
       return 0.001f;
     }
+
     default float getSize() {
       return 0.001f;
     }
+
     default float getCreateFile() {
       return 0.001f;
     }
+
     default float getCreateDirectory() {
       return 0.001f;
     }
+
     default float getLock() {
       return 0.0001f;
     }
@@ -106,9 +113,9 @@ public class RandomFailFileSystem extends FileSystemWrapper {
    * @param  fastRandom  A fast pseudo-random number generator for non-cryptographic purposes.
    */
   public RandomFailFileSystem(
-    FileSystem wrappedFileSystem,
-    FailureProbabilities failureProbabilities,
-    Random fastRandom
+      FileSystem wrappedFileSystem,
+      FailureProbabilities failureProbabilities,
+      Random fastRandom
   ) {
     super(wrappedFileSystem);
     this.failureProbabilities = failureProbabilities;
@@ -125,21 +132,21 @@ public class RandomFailFileSystem extends FileSystemWrapper {
    */
   public RandomFailFileSystem(FileSystem wrappedFileSystem) {
     this(
-      wrappedFileSystem,
-      new FailureProbabilities() {
-        // All defaults
-      },
-      defaultFastRandom
+        wrappedFileSystem,
+        new FailureProbabilities() {
+          // All defaults
+        },
+        defaultFastRandom
     );
   }
 
   protected void randomFail(float probability) throws RandomFailIOException {
     if (
-      probability > 0
-      && (
-        probability >= 1
-        || fastRandom.nextFloat() < probability
-      )
+        probability > 0
+            && (
+            probability >= 1
+                || fastRandom.nextFloat() < probability
+        )
     ) {
       throw new RandomFailIOException(probability);
     }
@@ -154,7 +161,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
       throw new IllegalArgumentException();
     }
     randomFail(failureProbabilities.getList());
-    PathWrapper pathWrapper = (PathWrapper)path;
+    PathWrapper pathWrapper = (PathWrapper) path;
     return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath)) {
       @Override
       public boolean hasNext() throws DirectoryIteratorException {

@@ -50,17 +50,20 @@ public class PathTest {
     System.out.println("<init>");
     new Path(null, "");
   }
+
   @SuppressWarnings("ResultOfObjectAllocationIgnored")
   public void testInitNullName() {
     System.out.println("<init>");
     new Path(root, null);
   }
+
   @Test(expected = InvalidPathException.class)
   @SuppressWarnings("ResultOfObjectAllocationIgnored")
   public void testInitEmpty() {
     System.out.println("<init>");
     new Path(root, "");
   }
+
   @Test(expected = InvalidPathException.class)
   @SuppressWarnings("ResultOfObjectAllocationIgnored")
   public void testInitSlash() {
@@ -246,28 +249,28 @@ public class PathTest {
   public void testExplode_0args() {
     System.out.println("explode");
     assertArrayEquals(
-      new String[0],
-      root.explode()
+        new String[0],
+        root.explode()
     );
     assertArrayEquals(
-      new String[] {"bin"},
-      bin.explode()
+        new String[]{"bin"},
+        bin.explode()
     );
     assertArrayEquals(
-      new String[] {"bin", "bash"},
-      bash.explode()
+        new String[]{"bin", "bash"},
+        bash.explode()
     );
     assertArrayEquals(
-      new String[] {"bin"},
-      bin2.explode()
+        new String[]{"bin"},
+        bin2.explode()
     );
     assertArrayEquals(
-      new String[] {"bin", "cp"},
-      cp.explode()
+        new String[]{"bin", "cp"},
+        cp.explode()
     );
     assertArrayEquals(
-      new String[] {"bin", "bash"},
-      readOnlyBash.explode()
+        new String[]{"bin", "bash"},
+        readOnlyBash.explode()
     );
   }
 
@@ -278,28 +281,28 @@ public class PathTest {
   public void testExplode_StringArr() {
     System.out.println("explode");
     assertArrayEquals(
-      new String[] {null, "2", "3", "4", "5"},
-      root.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{null, "2", "3", "4", "5"},
+        root.explode(new String[]{"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-      new String[] {"bin", null, "3", "4", "5"},
-      bin.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{"bin", null, "3", "4", "5"},
+        bin.explode(new String[]{"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-      new String[] {"bin", "bash", null, "4", "5"},
-      bash.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{"bin", "bash", null, "4", "5"},
+        bash.explode(new String[]{"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-      new String[] {"bin", null, "3", "4", "5"},
-      bin2.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{"bin", null, "3", "4", "5"},
+        bin2.explode(new String[]{"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-      new String[] {"bin", "cp", null, "4", "5"},
-      cp.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{"bin", "cp", null, "4", "5"},
+        cp.explode(new String[]{"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-      new String[] {"bin", "bash", null, "4", "5"},
-      readOnlyBash.explode(new String[] {"1", "2", "3", "4", "5"})
+        new String[]{"bin", "bash", null, "4", "5"},
+        readOnlyBash.explode(new String[]{"1", "2", "3", "4", "5"})
     );
   }
 }

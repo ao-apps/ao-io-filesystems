@@ -110,8 +110,8 @@ public class Path implements Comparable<Path> {
   @Override
   public boolean equals(Object o) {
     return
-      (o instanceof Path)
-      && equals((Path)o)
+        (o instanceof Path)
+            && equals((Path) o)
     ;
   }
 
@@ -254,6 +254,7 @@ public class Path implements Comparable<Path> {
       toString0(out);
     }
   }
+
   /** Recursive component of toString */
   private void toString0(Appendable out) throws IOException {
     if (parent != null) {

@@ -36,11 +36,13 @@ public abstract class FileSystemWrapper implements FileSystem {
 
   protected static class PathWrapper extends Path {
     protected final Path wrappedPath;
+
     /** Wraps a root */
     private PathWrapper(FileSystemWrapper wrapper, Path wrappedRoot) {
       super(wrapper);
       this.wrappedPath = wrappedRoot;
     }
+
     /** Wraps a non-root */
     private PathWrapper(PathWrapper parent, Path wrappedPath) {
       super(parent, wrappedPath.getName());
@@ -61,9 +63,9 @@ public abstract class FileSystemWrapper implements FileSystem {
    */
   protected PathWrapper wrapPath(Path path) {
     return
-      (path.getParent() == null)
-      ? new PathWrapper(this, path)
-      : wrapSubPath(wrapPath(path.getParent()), path)
+        (path.getParent() == null)
+            ? new PathWrapper(this, path)
+            : wrapSubPath(wrapPath(path.getParent()), path)
     ;
   }
 
@@ -72,7 +74,7 @@ public abstract class FileSystemWrapper implements FileSystem {
    */
   protected Path unwrapPath(Path path) {
     assert path.getFileSystem() == this;
-    Path wrappedPath = ((PathWrapper)path).wrappedPath;
+    Path wrappedPath = ((PathWrapper) path).wrappedPath;
     assert wrappedPath.getFileSystem() == wrappedFileSystem;
     return wrappedPath;
   }
@@ -132,7 +134,7 @@ public abstract class FileSystemWrapper implements FileSystem {
     if (path.getFileSystem() != this) {
       throw new IllegalArgumentException();
     }
-    PathWrapper pathWrapper = (PathWrapper)path;
+    PathWrapper pathWrapper = (PathWrapper) path;
     return new PathIteratorWrapper(pathWrapper, wrappedFileSystem.list(pathWrapper.wrappedPath));
   }
 

@@ -148,8 +148,8 @@ public class JavaFileSystem implements FileSystem {
         String rootStr = root.toString();
         if (rootStr.equals(exploded[0])) {
           return javaFS.getPath(
-            rootStr,
-            Arrays.copyOfRange(exploded, 1, exploded.length)
+              rootStr,
+              Arrays.copyOfRange(exploded, 1, exploded.length)
           );
         }
       }

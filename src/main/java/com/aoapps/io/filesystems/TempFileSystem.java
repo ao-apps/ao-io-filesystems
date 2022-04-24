@@ -44,6 +44,7 @@ public class TempFileSystem implements FileSystem {
 
   private static class Directory extends FileSystemObject {
     private final LinkedList<String> files = new LinkedList<>();
+
     private String[] list() {
       return files.toArray(new String[files.size()]);
     }
@@ -86,7 +87,7 @@ public class TempFileSystem implements FileSystem {
       if (!(file instanceof Directory)) {
         throw new NotDirectoryException(path.toString());
       }
-      list = ((Directory)file).list();
+      list = ((Directory) file).list();
     }
     return new PathIterator() {
       private int next = 0;

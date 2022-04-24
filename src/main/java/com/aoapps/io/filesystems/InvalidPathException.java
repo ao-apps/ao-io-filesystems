@@ -45,7 +45,7 @@ public class InvalidPathException extends IllegalArgumentException {
 
   static {
     Throwables.registerSurrogateFactory(InvalidPathException.class, (template, cause) ->
-      new InvalidPathException(template.getMessage(), cause)
+        new InvalidPathException(template.getMessage(), cause)
     );
   }
 }
