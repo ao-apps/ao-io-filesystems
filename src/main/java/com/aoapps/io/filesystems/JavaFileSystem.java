@@ -66,12 +66,15 @@ public class JavaFileSystem implements FileSystem {
     return defaultInstance;
   }
 
-  protected final java.nio.file.FileSystem javaFS;
+  protected final java.nio.file.FileSystem javaFileSystem;
   protected final boolean isSingleRoot;
 
-  public JavaFileSystem(java.nio.file.FileSystem javaFS) {
-    this.javaFS = javaFS;
-    Iterator<java.nio.file.Path> roots = javaFS.getRootDirectories().iterator();
+  /**
+   * Creates a new Java filesystem.
+   */
+  public JavaFileSystem(java.nio.file.FileSystem javaFileSystem) {
+    this.javaFileSystem = javaFileSystem;
+    Iterator<java.nio.file.Path> roots = javaFileSystem.getRootDirectories().iterator();
     if (!roots.hasNext()) {
       throw new AssertionError("No root");
     }
@@ -81,12 +84,15 @@ public class JavaFileSystem implements FileSystem {
       isSingleRoot = false;
     } else {
       // Root must simply be the separator (Not something like C:\)
-      isSingleRoot = javaFS.getSeparator().equals(root.toString());
+      isSingleRoot = javaFileSystem.getSeparator().equals(root.toString());
     }
   }
 
   /**
+   * {@inheritDoc}
+   * <p>
    * General filename restrictions are:
+   * </p>
    * <ol>
    * <li>Must not be longer than <code>MAX_PATH_NAME_LENGTH</code> characters</li>
    * <li>Must not contain the NULL character</li>
@@ -109,7 +115,7 @@ public class JavaFileSystem implements FileSystem {
       throw new InvalidPathException("Path name must not contain the NULL character: " + name);
     }
     // Path.SEPARATOR already checked in the Path constructor
-    String javaSep = javaFS.getSeparator();
+    String javaSep = javaFileSystem.getSeparator();
     if (javaSep.length() != 1 && javaSep.charAt(0) != Path.SEPARATOR) {
       // Must not contain the current platform separator character
       if (name.contains(javaSep)) {
@@ -137,17 +143,17 @@ public class JavaFileSystem implements FileSystem {
   protected java.nio.file.Path getJavaPath(Path path) throws IOException {
     assert path.getFileSystem() == this;
     if (isSingleRoot) {
-      return javaFS.getPath(javaFS.getSeparator(), path.explode());
+      return javaFileSystem.getPath(javaFileSystem.getSeparator(), path.explode());
     } else {
       String[] exploded = path.explode();
       if (exploded.length == 0) {
         throw new IOException("Cannot map fake root into non-Unix environment");
       }
-      String expectedRoot = exploded[0] + javaFS.getSeparator();
-      for (java.nio.file.Path root : javaFS.getRootDirectories()) {
+      String expectedRoot = exploded[0] + javaFileSystem.getSeparator();
+      for (java.nio.file.Path root : javaFileSystem.getRootDirectories()) {
         String rootStr = root.toString();
         if (rootStr.equals(exploded[0])) {
-          return javaFS.getPath(
+          return javaFileSystem.getPath(
               rootStr,
               Arrays.copyOfRange(exploded, 1, exploded.length)
           );
@@ -170,10 +176,12 @@ public class JavaFileSystem implements FileSystem {
         public boolean hasNext() {
           return iter.hasNext();
         }
+
         @Override
         public Path next() throws NoSuchElementException {
           return new Path(path, iter.next().getFileName().toString());
         }
+
         @Override
         public void close() throws IOException {
           stream.close();
@@ -181,13 +189,14 @@ public class JavaFileSystem implements FileSystem {
       };
     } else {
       // List roots and strip their trailing separator
-      String javaSeparator = javaFS.getSeparator();
-      Iterator<java.nio.file.Path> rootIter = javaFS.getRootDirectories().iterator();
+      String javaSeparator = javaFileSystem.getSeparator();
+      Iterator<java.nio.file.Path> rootIter = javaFileSystem.getRootDirectories().iterator();
       return new PathIterator() {
         @Override
         public boolean hasNext() {
           return rootIter.hasNext();
         }
+
         @Override
         public Path next() throws NoSuchElementException {
           String rootStr = rootIter.next().toString();
@@ -196,6 +205,7 @@ public class JavaFileSystem implements FileSystem {
           }
           return new Path(path, rootStr.substring(0, rootStr.length() - javaSeparator.length()));
         }
+
         @Override
         public void close() {
           // Nothing to do
@@ -248,6 +258,7 @@ public class JavaFileSystem implements FileSystem {
       public boolean isValid() {
         return lock.isValid();
       }
+
       @Override
       public void close() throws IOException {
         channel.close();

@@ -38,6 +38,9 @@ import org.apache.commons.lang3.NotImplementedException;
  */
 public class TempFileSystem implements FileSystem {
 
+  /**
+   * TODO.
+   */
   protected abstract static class FileSystemObject {
     // TODO
   }
@@ -56,6 +59,9 @@ public class TempFileSystem implements FileSystem {
 
   protected final Map<Path, FileSystemObject> files = new HashMap<>();
 
+  /**
+   * Creates a new temp filesystem.
+   */
   public TempFileSystem() {
     synchronized (files) {
       files.put(new Path(this), new Directory());
@@ -95,6 +101,7 @@ public class TempFileSystem implements FileSystem {
       public boolean hasNext() {
         return next < list.length;
       }
+
       @Override
       public Path next() throws NoSuchElementException {
         if (next >= list.length) {
@@ -102,6 +109,7 @@ public class TempFileSystem implements FileSystem {
         }
         return new Path(path, list[next++]);
       }
+
       @Override
       public void close() {
         // Nothing to do

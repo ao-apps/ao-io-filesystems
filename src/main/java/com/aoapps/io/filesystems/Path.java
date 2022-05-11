@@ -105,14 +105,15 @@ public class Path implements Comparable<Path> {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * @see #equals(com.aoapps.io.filesystems.Path)
    */
   @Override
   public boolean equals(Object o) {
     return
         (o instanceof Path)
-            && equals((Path) o)
-    ;
+            && equals((Path) o);
   }
 
   /**
@@ -172,27 +173,27 @@ public class Path implements Comparable<Path> {
     Path me = this;
     Path o = other;
     int meDepth = me.depth;
-    int oDepth = o.depth;
+    int odepth = o.depth;
     int tailDiff;
-    if (meDepth < oDepth) {
+    if (meDepth < odepth) {
       tailDiff = -1;
-      while (meDepth < oDepth) {
+      while (meDepth < odepth) {
         o = o.parent;
-        oDepth--;
+        odepth--;
       }
-    } else if (meDepth > oDepth) {
+    } else if (meDepth > odepth) {
       tailDiff = 1;
-      while (meDepth > oDepth) {
+      while (meDepth > odepth) {
         me = me.parent;
         meDepth--;
       }
     } else {
-      assert meDepth == oDepth;
+      assert meDepth == odepth;
       tailDiff = 0;
     }
     assert me.depth == meDepth;
-    assert o.depth == oDepth;
-    assert meDepth == oDepth;
+    assert o.depth == odepth;
+    assert meDepth == odepth;
     // Roots are always equal
     if (meDepth != 0) {
       // Compare parents first
@@ -255,7 +256,9 @@ public class Path implements Comparable<Path> {
     }
   }
 
-  /** Recursive component of toString */
+  /**
+   * Recursive component of {@link #toString()}.
+   */
   private void toString0(Appendable out) throws IOException {
     if (parent != null) {
       parent.toString0(out);

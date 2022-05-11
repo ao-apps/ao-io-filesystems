@@ -39,6 +39,8 @@ import java.util.Iterator;
 public abstract class PathIterator implements Iterator<Path>, Closeable {
 
   /**
+   * {@inheritDoc}
+   *
    * @throws DirectoryIteratorException when an underlying IOException has occurred.
    */
   @Override

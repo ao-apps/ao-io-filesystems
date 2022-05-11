@@ -72,6 +72,9 @@ public class RandomFailFileSystem extends FileSystemWrapper {
     }
   }
 
+  /**
+   * Provides the failure probabilities.
+   */
   public static interface FailureProbabilities {
     default float getList() {
       return 0.001f;
@@ -110,6 +113,8 @@ public class RandomFailFileSystem extends FileSystemWrapper {
   private final Random fastRandom;
 
   /**
+   * Creates a new random-fail filesystem, wrapping the given filesystem.
+   *
    * @param  fastRandom  A fast pseudo-random number generator for non-cryptographic purposes.
    */
   public RandomFailFileSystem(
@@ -172,6 +177,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
         }
         return super.hasNext();
       }
+
       @Override
       public void close() throws RandomFailIOException, IOException {
         randomFail(failureProbabilities.getListIterateClose());

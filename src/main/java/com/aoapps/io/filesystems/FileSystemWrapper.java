@@ -34,16 +34,23 @@ import java.util.NoSuchElementException;
  */
 public abstract class FileSystemWrapper implements FileSystem {
 
+  /**
+   * Wraps a {@link Path}.
+   */
   protected static class PathWrapper extends Path {
     protected final Path wrappedPath;
 
-    /** Wraps a root */
+    /**
+     * Wraps a root.
+     */
     private PathWrapper(FileSystemWrapper wrapper, Path wrappedRoot) {
       super(wrapper);
       this.wrappedPath = wrappedRoot;
     }
 
-    /** Wraps a non-root */
+    /**
+     * Wraps a non-root.
+     */
     private PathWrapper(PathWrapper parent, Path wrappedPath) {
       super(parent, wrappedPath.getName());
       assert parent.wrappedPath == wrappedPath.getParent();
@@ -65,8 +72,7 @@ public abstract class FileSystemWrapper implements FileSystem {
     return
         (path.getParent() == null)
             ? new PathWrapper(this, path)
-            : wrapSubPath(wrapPath(path.getParent()), path)
-    ;
+            : wrapSubPath(wrapPath(path.getParent()), path);
   }
 
   /**
@@ -103,6 +109,9 @@ public abstract class FileSystemWrapper implements FileSystem {
     return wrapPath(wrappedFileSystem.parsePath(value));
   }
 
+  /**
+   * Wraps {@link PathIterator}, wrapping each result in {@link #next()}.
+   */
   protected class PathIteratorWrapper extends PathIterator {
 
     protected final PathWrapper parent;

@@ -23,10 +23,18 @@
 
 package com.aoapps.io.filesystems;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
+ * Tests {@link Path}.
+ *
  * @author  AO Industries, Inc.
  */
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -77,10 +85,10 @@ public class PathTest {
   @Test
   public void testEquals_Object() {
     System.out.println("equals");
-    Object rootObj = root;
-    Object binObj = bin;
-    Object bashObj = bash;
-    Object bin2Obj = bin2;
+    final Object rootObj = root;
+    final Object binObj = bin;
+    final Object bashObj = bash;
+    final Object bin2Obj = bin2;
     // root
     assertTrue(root.equals(rootObj));
     assertFalse(root.equals(binObj));
