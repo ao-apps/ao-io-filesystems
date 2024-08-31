@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2019, 2020, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2019, 2020, 2021, 2022, 2024  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -128,11 +128,6 @@ public class RandomFailFileSystem extends FileSystemWrapper {
   }
 
   /**
-   * A fast pseudo-random number generator for non-cryptographic purposes.
-   */
-  private static final Random defaultFastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(Long.BYTES)));
-
-  /**
    * Uses default probabilities and a default fast pseudo-random number generator for non-cryptographic purposes.
    */
   public RandomFailFileSystem(FileSystem wrappedFileSystem) {
@@ -144,6 +139,11 @@ public class RandomFailFileSystem extends FileSystemWrapper {
         defaultFastRandom
     );
   }
+
+  /**
+   * A fast pseudo-random number generator for non-cryptographic purposes.
+   */
+  private static final Random defaultFastRandom = new Random(IoUtils.bufferToLong(new SecureRandom().generateSeed(Long.BYTES)));
 
   protected void randomFail(float probability) throws RandomFailIOException {
     if (
