@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ao-io-filesystems - Minimal filesystem abstraction.
-Copyright (C) 2022  AO Industries, Inc.
+Copyright (C) 2022, 2024  AO Industries, Inc.
     support@aoindustries.com
     7262 Bull Pen Cir
     Mobile, AL 36695
@@ -27,11 +27,20 @@ along with ao-io-filesystems.  If not, see <https://www.gnu.org/licenses/>.
 
 <suppressions>
 
+  <!-- TODO: Complete Javadocs -->
+  <suppress checks="MissingJavadocMethod" />
+
   <!-- Consistency with standard "IOException" -->
   <suppress
     checks="AbbreviationAsWordInName"
     files="[/\\]com[/\\]aoapps[/\\]io[/\\]filesystems[/\\]RandomFailFileSystem\.java$"
     message="'RandomFailIOException'"
+  />
+
+  <!-- Allow non-standard method names in tests -->
+  <suppress
+    checks="MethodName"
+    files="[/\\]test[/\\]java[/\\]com[/\\]aoapps[/\\]io[/\\]filesystems[/\\]"
   />
 
 </suppressions>
