@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2021, 2022, 2024  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -36,15 +36,13 @@ import java.util.NoSuchElementException;
 
 /**
  * Wraps any standard FileSystem implementation.
- * <p>
- * The system is treated as a single-root file system.  For Windows, this means
- * that <code>C:\</code> will become <code>/C:/</code>.
- * </p>
- * <p>
- * Note: To work with any possible filename correctly in Linux, one must use a
+ *
+ * <p>The system is treated as a single-root file system.  For Windows, this means
+ * that <code>C:\</code> will become <code>/C:/</code>.</p>
+ *
+ * <p>Note: To work with any possible filename correctly in Linux, one must use a
  * single-byte locale, such as "C", "POSIX", or "en_US".  Java has issues when
- * using UTF-8 encoding and filenames do not contain valid UTF-8.
- * </p>
+ * using UTF-8 encoding and filenames do not contain valid UTF-8.</p>
  *
  * @author  AO Industries, Inc.
  */
@@ -90,9 +88,9 @@ public class JavaFileSystem implements FileSystem {
 
   /**
    * {@inheritDoc}
-   * <p>
-   * General filename restrictions are:
-   * </p>
+   *
+   * <p>General filename restrictions are:</p>
+   *
    * <ol>
    * <li>Must not be longer than <code>MAX_PATH_NAME_LENGTH</code> characters</li>
    * <li>Must not contain the NULL character</li>

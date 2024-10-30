@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2020, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2020, 2021, 2022, 2024  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -31,16 +31,14 @@ import java.nio.file.NotDirectoryException;
 
 /**
  * The most basic layer of what all file systems have in common.
- * <p>
- * Every file system is forced to be case-sensitive, even if there is great
- * overhead in doing so.
- * </p>
- * <p>
- * We know this is in some ways redundant with the <code>java.nio.file</code>
+ *
+ * <p>Every file system is forced to be case-sensitive, even if there is great
+ * overhead in doing so.</p>
+ *
+ * <p>We know this is in some ways redundant with the <code>java.nio.file</code>
  * package released in Java 1.7.  We are looking for something with a much
  * different (and narrower) focus, such as hiding differences between platforms
- * and trying to hide security gotchas.
- * </p>
+ * and trying to hide security gotchas.</p>
  *
  * @author  AO Industries, Inc.
  */

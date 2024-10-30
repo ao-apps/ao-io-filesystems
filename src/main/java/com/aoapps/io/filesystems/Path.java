@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2021, 2022, 2024  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -28,25 +28,20 @@ import java.io.IOException;
 /**
  * The object representing the path to a file.  This API is for programmer tools,
  * not for user interfaces.  We try to hide the platform differences.
- * <p>
- * As there is no concept of "working directory" in this API, the path is
+ *
+ * <p>As there is no concept of "working directory" in this API, the path is
  * always absolute.  However, the path may be interpreted from a different
- * effective root by a file system.
- * </p>
- * <p>
- * Each file system may limit the length of path names or total paths, but
- * there is no limit imposed within <code>Path</code> itself.
- * </p>
- * <p>
- * The path separator is always "/", even on platforms that do otherwise.
- * </p>
- * <p>
- * The root path is an empty string (and the only path name that may be an empty
- * string).  In string form, the root path by itself is represented as "/".
- * </p>
- * <p>
- * Paths are case-sensitive, even on platforms that do otherwise.
- * </p>
+ * effective root by a file system.</p>
+ *
+ * <p>Each file system may limit the length of path names or total paths, but
+ * there is no limit imposed within <code>Path</code> itself.</p>
+ *
+ * <p>The path separator is always "/", even on platforms that do otherwise.</p>
+ *
+ * <p>The root path is an empty string (and the only path name that may be an empty
+ * string).  In string form, the root path by itself is represented as "/".</p>
+ *
+ * <p>Paths are case-sensitive, even on platforms that do otherwise.</p>
  *
  * @author  AO Industries, Inc.
  */
