@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2019, 2020, 2021, 2022, 2024  AO Industries, Inc.
+ * Copyright (C) 2015, 2019, 2020, 2021, 2022, 2024, 2025  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -151,7 +151,7 @@ public class RandomFailFileSystem extends FileSystemWrapper {
             && (
             probability >= 1
                 || fastRandom.nextFloat() < probability
-        )
+          )
     ) {
       throw new RandomFailIOException(probability);
     }
