@@ -22,7 +22,7 @@ Minimal filesystem abstraction.
 * [Project Home](https://oss.aoapps.com/io-filesystems/)
 * [Changelog](https://oss.aoapps.com/io-filesystems/changelog)
 * [API Docs](https://oss.aoapps.com/io-filesystems/apidocs/)
-* [Maven Central Repository](https://central.sonatype.com/artifact/com.aoapps/ao-io-filesystems)
+* [Central Repository](https://central.sonatype.com/artifact/com.aoapps/ao-io-filesystems)
 * [GitHub](https://github.com/ao-apps/ao-io-filesystems)
 
 ## Modules
