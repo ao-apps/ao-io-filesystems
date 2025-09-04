@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2019, 2020, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2019, 2020, 2021, 2022, 2025  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -42,7 +42,7 @@ public class TempFileSystem implements FileSystem {
    * TODO.
    */
   protected abstract static class FileSystemObject {
-    // TODO
+    // TODO: Implement
   }
 
   private static class Directory extends FileSystemObject {
@@ -54,7 +54,7 @@ public class TempFileSystem implements FileSystem {
   }
 
   private static class RegularFile extends FileSystemObject {
-    // TODO
+    // TODO: Implement
   }
 
   protected final Map<Path, FileSystemObject> files = new HashMap<>();
