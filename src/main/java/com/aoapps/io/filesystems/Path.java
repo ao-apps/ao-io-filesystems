@@ -102,7 +102,7 @@ public class Path implements Comparable<Path> {
   /**
    * {@inheritDoc}
    *
-   * @see #equals(com.aoapps.io.filesystems.Path)
+   * @see Path#equals(com.aoapps.io.filesystems.Path)
    */
   @Override
   public boolean equals(Object o) {
@@ -208,7 +208,7 @@ public class Path implements Comparable<Path> {
    * Gets a string representation of the path.
    * The root is the separator by itself ("/").
    *
-   * @see #toString(java.lang.Appendable) for a possibly faster implementation
+   * @see Path#toString(java.lang.Appendable) for a possibly faster implementation
    * @see FileSystem#parsePath(java.lang.String) for the inverse operation
    */
   @Override
@@ -252,7 +252,7 @@ public class Path implements Comparable<Path> {
   }
 
   /**
-   * Recursive component of {@link #toString()}.
+   * Recursive component of {@link Path#toString()}.
    */
   private void toString0(Appendable out) throws IOException {
     if (parent != null) {
@@ -288,7 +288,7 @@ public class Path implements Comparable<Path> {
    * This is also the number of non-root names in this path, such as the
    * number of elements that will be returned from <code>explode()</code>.
    *
-   * @see #explode()
+   * @see Path#explode()
    */
   public int getDepth() {
     return depth;

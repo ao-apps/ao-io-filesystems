@@ -110,7 +110,7 @@ public abstract class FileSystemWrapper implements FileSystem {
   }
 
   /**
-   * Wraps {@link PathIterator}, wrapping each result in {@link #next()}.
+   * Wraps {@link PathIterator}, wrapping each result in {@link PathIteratorWrapper#next()}.
    */
   protected class PathIteratorWrapper extends PathIterator {
 
