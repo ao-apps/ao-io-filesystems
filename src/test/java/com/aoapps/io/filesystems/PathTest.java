@@ -1,6 +1,6 @@
 /*
  * ao-io-filesystems - Advanced filesystem utilities.
- * Copyright (C) 2015, 2020, 2021, 2022  AO Industries, Inc.
+ * Copyright (C) 2015, 2020, 2021, 2022, 2026  AO Industries, Inc.
  *     support@aoindustries.com
  *     7262 Bull Pen Cir
  *     Mobile, AL 36695
@@ -261,23 +261,23 @@ public class PathTest {
         root.explode()
     );
     assertArrayEquals(
-        new String[]{"bin"},
+        new String[] {"bin"},
         bin.explode()
     );
     assertArrayEquals(
-        new String[]{"bin", "bash"},
+        new String[] {"bin", "bash"},
         bash.explode()
     );
     assertArrayEquals(
-        new String[]{"bin"},
+        new String[] {"bin"},
         bin2.explode()
     );
     assertArrayEquals(
-        new String[]{"bin", "cp"},
+        new String[] {"bin", "cp"},
         cp.explode()
     );
     assertArrayEquals(
-        new String[]{"bin", "bash"},
+        new String[] {"bin", "bash"},
         readOnlyBash.explode()
     );
   }
@@ -289,28 +289,28 @@ public class PathTest {
   public void testExplode_StringArr() {
     System.out.println("explode");
     assertArrayEquals(
-        new String[]{null, "2", "3", "4", "5"},
-        root.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {null, "2", "3", "4", "5"},
+        root.explode(new String[] {"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-        new String[]{"bin", null, "3", "4", "5"},
-        bin.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {"bin", null, "3", "4", "5"},
+        bin.explode(new String[] {"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-        new String[]{"bin", "bash", null, "4", "5"},
-        bash.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {"bin", "bash", null, "4", "5"},
+        bash.explode(new String[] {"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-        new String[]{"bin", null, "3", "4", "5"},
-        bin2.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {"bin", null, "3", "4", "5"},
+        bin2.explode(new String[] {"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-        new String[]{"bin", "cp", null, "4", "5"},
-        cp.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {"bin", "cp", null, "4", "5"},
+        cp.explode(new String[] {"1", "2", "3", "4", "5"})
     );
     assertArrayEquals(
-        new String[]{"bin", "bash", null, "4", "5"},
-        readOnlyBash.explode(new String[]{"1", "2", "3", "4", "5"})
+        new String[] {"bin", "bash", null, "4", "5"},
+        readOnlyBash.explode(new String[] {"1", "2", "3", "4", "5"})
     );
   }
 }
